@@ -35,16 +35,14 @@ if len(sys.argv) == 1:
 	exit(1)
 
 with open(sys.argv[1]) as m:
-	i=0
 	for line in m:
 		for c in line:
 			if c == '\n':
-				i+=1
-				lambda_map.append([])
+				lambda_map.insert(0,[])
 				continue
-			lambda_map[i].append(c)
+			lambda_map[0].append(c)
 
-lambda_map.pop(i)
+lambda_map.pop(0)
 
 print "Map displayed by Displayer"
 displayer=MapDrawer(lambda_map)
