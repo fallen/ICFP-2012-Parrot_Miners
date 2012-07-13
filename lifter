@@ -50,5 +50,11 @@ while 1:
 		termios.tcsetattr(fd, termios.TCSANOW, old_settings)
 		os.system("reset")
 		sys.exit(0)
-	cont.set_movement(key)
-	print key
+	if key == "z":
+		cont.set_movement("U")
+	if key == "s":
+		cont.set_movement("D")
+	if key == "q":
+		cont.set_movement("L")
+	if key == "d":
+		cont.set_movement("R")
