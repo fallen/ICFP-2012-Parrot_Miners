@@ -1,14 +1,20 @@
 import copy
+import sys
 
 class world:
 	
-	def __init__(self, lambda_map):
+	def __init__(self, lambda_map, waterstuff):
 		self.lambda_map = lambda_map
 		self.lambdas = []
 		#~ self.logger = debuglogger()
-		self.killed=False
 		self.won= False
 		self.last_points=0
+		
+		self.waterworld=None
+		self.killed=False
+		self.warning=""
+		self.death_cause=None
+		self.waterworld=waterworld(self,waterstuff)
 		
 		for x in range(len(self.lambda_map)):
 			for y in range(len(self.lambda_map[x])):
@@ -54,13 +60,27 @@ class world:
 		for x in range(len(new_map)):
 			for y in range(len(new_map[x])):			
 				self.lambda_map[x][y] = new_map[x][y]
-				
+
+
 	#If i have a rock over my head that's just been moved there, i'm dead :<
 	#This must be called each time a rock moves
 	def am_i_dead(self,rockpos):
 		if self.robotpos[0] == rockpos[0] and self.robotpos[1] == rockpos[1]-1:
-			self.killed=True
-		
+			self.death_cause="Robot died by rock at ("+str(rockpos[0])+","+str(rockpos[1])+")"
+			self.kill()
+
+	def print_status(self):
+		if self.warning != "":
+			print self.warning
+		if self.killed:
+			print self.death_cause
+			print >> sys.stderr, 'Dead robot is dead :('
+		print self.waterworld
+
+
+	def kill(self):
+		self.killed=True
+
 	def move(self, x,y, xp,yp):
 		self.last_points -= 1
 		print self.lambda_map[xp][yp]
@@ -110,9 +130,53 @@ class world:
 			pass
 		#~ self.logger.write(move)
 		self.single_round()
+		if self.waterworld != None:
+			self.waterworld.tick(self.robotpos[1])
 		return self.lambda_map
+			
+
+
+class waterworld:
+	def __init__(self,world,(water,flooding,waterproof)):
+		self.waterproof=waterproof # number of steps we can survive underwater
+		self.flooding=flooding # number of steps before water++
+		self.water=water # altitude under which we're underwater
+		self.counter=0
+		self.next_flood=0
+		self.world=world
+
+	def reset_ticker(self):
+		self.counter=0
+		self.next_flood=0
+
+#Call each round after map update
+	def tick(self,y):
+		if self.flooding>0:
+			self.next_flood+=1
+			if y <= self.water:
+				self.world.warning="!UNDERWATER! water "+str(self.water)+" robot_y "+str(y)+" counter "+str(self.counter)
+				if self.waterproof <= self.counter:
+					self.world.kill()
+					self.world.death_cause="Robot drowned : "+str(self.counter)+" steps underwater with "+str(self.waterproof)+" waterproof points"
+				self.counter+=1
+			else:
+				self.counter=0 # We only count consecutive steps
+				self.world.warning=""
+			if self.next_flood == self.flooding:
+				self.water+=1
+				self.next_flood=0
+		
 
 		
+	def __str__(self):
+		res="Water "+str(self.water)+"\n"
+		res=res+"Flooding "+str(self.flooding)+"\n"
+		res=res+"Waterproof "+str(self.waterproof)+"\n"
+		res=res+"Next flood "+ str(self.next_flood)+"\n"
+		return res
+		
+
+
 class debuglogger():
 	f=open("output","w")	
 	loggedstr = ""
