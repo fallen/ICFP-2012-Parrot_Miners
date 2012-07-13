@@ -1,6 +1,6 @@
 import copy
 
-class controller:
+class world:
 	
 	def __init__(self, lambda_map):
 		self.lambda_map = lambda_map
@@ -95,6 +95,7 @@ class controller:
 			pass
 		self.logger.write(move)
 		self.single_round()
+
 		
 class debuglogger():
 	f=open("output","w")	

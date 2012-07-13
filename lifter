@@ -2,9 +2,10 @@
 # -*- indent-tabs-mode: t -*-
 
 
-import sys, termios, tty, os, signal, time
+import sys, os, signal, time
 from displayer import MapDrawer
-from mapupdater import controller
+from mapupdater import world
+from controler import controler, kcontroler
 
 def reset_tty_and_exit():
 	termios.tcsetattr(fd, termios.TCSANOW, old_settings)
@@ -58,36 +59,13 @@ lambda_map=displayer.getmap()
 
 displayer.draw()
 
-cont = controller(lambda_map)
-
+world = world(lambda_map)
+control = kcontroler(lambda_map)
 # We set terminal in raw mode to catch single key events
 # This allows stdin.read() to be unbuffered
 # which means read(1) will return, even without any \n
 
 while 1:
-	fd = sys.stdin.fileno()
-	old_settings = termios.tcgetattr(fd)
-	tty.setraw(fd)
-	key = sys.stdin.read(1)
-	termios.tcsetattr(fd, termios.TCSANOW, old_settings)
-# in raw terminal mode CTRL+C is ASCII code 0x03
-# We exit upon CTRL+C
-	if key == ' ':
-		termios.tcsetattr(fd, termios.TCSANOW, old_settings)
-		os.system("reset")
-		sys.exit(0)
-	
-	if key == "z":
-		cont.set_movement("U")
-	if key == "s":
-		cont.set_movement("D")
-	if key == "q":
-		cont.set_movement("L")
-	if key == "d":
-		cont.set_movement("R")
-	if key == "a":
-		cont.set_movement("A")
-	if key == "w":
-		cont.set_movement("W")
 
+	world.set_movement(control.get_next())
 	displayer.draw()
