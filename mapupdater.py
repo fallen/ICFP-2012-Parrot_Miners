@@ -5,15 +5,20 @@ class world:
 	def __init__(self, lambda_map):
 		self.lambda_map = lambda_map
 		self.lambdas = []
-		self.logger = debuglogger()
+		#~ self.logger = debuglogger()
 		self.killed=False
-
+		self.won= False
+		self.last_points=0
+		
 		for x in range(len(self.lambda_map)):
 			for y in range(len(self.lambda_map[x])):
 				if self.lambda_map[x][y] == 'R':
 					self.robotpos = (x,y)
 				if self.lambda_map[x][y] == '\\':
 					self.lambdas.append((x,y))
+	
+	def get_points(self):
+		return self.last_points
 		
 	def single_round(self):
 		#allocate
@@ -54,13 +59,16 @@ class world:
 	#This must be called each time a rock moves
 	def am_i_dead(self,rockpos):
 		if self.robotpos[0] == rockpos[0] and self.robotpos[1] == rockpos[1]-1:
-			print "Robot died by rock at (",rockpos[0],",",rockpos[1],")"
 			self.killed=True
 		
 	def move(self, x,y, xp,yp):
+		self.last_points -= 1
+		print self.lambda_map[xp][yp]
 		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o':
+			print "if1"
 			if self.lambda_map[xp][yp] == '\\':
 				self.lambdas.remove((xp,yp))
+				self.last_points+=25
 			self.lambda_map[xp][yp] = 'R'
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
@@ -77,10 +85,17 @@ class world:
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
 			return True
+		elif self.lambda_map[xp][yp] == 'O':
+			self.won = True
+			self.lambda_map[xp][yp] = 'R'
+			self.lambda_map[x][y] = ' '
+			return True
 		else :
+			print "else"
 			return False
-		
+	
 	def set_movement(self, move):
+		self.last_points=0
 		if move == "U":
 			self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]+1)
 		if move == "D":
@@ -93,8 +108,9 @@ class world:
 			pass
 		if move == "W":
 			pass
-		self.logger.write(move)
+		#~ self.logger.write(move)
 		self.single_round()
+		return self.lambda_map
 
 		
 class debuglogger():
@@ -108,9 +124,9 @@ class debuglogger():
 		print self.loggedstr
 		
 	def __del__(self):
-		print "write_to_file"
+		#~ print "write_to_file"
 		self.f.write(self.loggedstr)
-		self.f.close()
+		#~ self.f.close()
 		
 #~ class normallogger(logger):
 	#~ f=open(sys.stdout) 	

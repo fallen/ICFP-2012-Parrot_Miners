@@ -5,11 +5,11 @@
 import sys, os, signal, time
 from displayer import MapDrawer
 from mapupdater import world
-from controler import controler, kcontroler
+from controler import controler, kcontroler, botcontroler
 
 def reset_tty_and_exit():
-	termios.tcsetattr(fd, termios.TCSANOW, old_settings)
-	os.system("reset")
+	#termios.tcsetattr(fd, termios.TCSANOW, old_settings)
+	#~ os.system("reset")
 	sys.exit(0)
 
 def handler(signum, frame):
@@ -57,7 +57,6 @@ with f as m:
 lambda_map.pop(0)
 #padding with ' '
 maxcol = max([len(lambda_map[i]) for i,v in enumerate(lambda_map)])
-print maxcol
 for i, val in enumerate(lambda_map):
 	if len(lambda_map[i]) != maxcol:
 		val.extend([' ' for padder in range(maxcol - len(val)+1)])
@@ -72,13 +71,23 @@ if debug :
 	displayer.draw()
 
 world = world(lambda_map)
-control = kcontroler(lambda_map)
+control = kcontroler(world)
+#~ control = botcontroler(world)
+
 # We set terminal in raw mode to catch single key events
 # This allows stdin.read() to be unbuffered
 # which means read(1) will return, even without any \n
 
 if debug:
+	score = 0
 	while 1:
 		world.set_movement(control.get_next())
+		score += world.get_points()
 		os.system("clear")
 		displayer.draw()
+		if world.killed:
+			print "lost"
+			reset_tty_and_exit()
+		elif world.won:
+			print score
+			reset_tty_and_exit()
