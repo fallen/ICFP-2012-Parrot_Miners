@@ -5,19 +5,20 @@ class controller:
 	def __init__(self, lambda_map):
 		self.lambda_map = lambda_map
 		self.lambdas = []
+		self.logger = debuglogger()
 		for x in range(len(self.lambda_map)):
 			for y in range(len(self.lambda_map[x])):
 				if self.lambda_map[x][y] == 'R':
 					self.robotpos = (x,y)
 				if self.lambda_map[x][y] == '\\':
 					self.lambdas.append((x,y))
-				 
+		
 	def single_round(self):
 		#allocate
 		new_map = copy.deepcopy(self.lambda_map)
 		#set it to ''
-		for x in range(len(new_map)):
-			for y in range(len(new_map[x])):
+		for y in range(len(new_map[0])):
+			for x in range(len(new_map)):
 				if self.lambda_map[x][y] == '*':
 					if self.lambda_map[x][y-1] == ' ':
 						new_map[x][y] = ' '
@@ -75,4 +76,23 @@ class controller:
 			pass
 		if move == "W":
 			pass
+		self.logger.write(move)
 		self.single_round()
+		
+class debuglogger():
+	f=open("output","w")	
+	loggedstr = ""
+	def __init__(self):
+		pass
+	
+	def write(self, text):
+		self.loggedstr = self.loggedstr+text
+		print self.loggedstr
+		
+	def __del__(self):
+		print "write_to_file"
+		self.f.write(self.loggedstr)
+		self.f.close()
+		
+#~ class normallogger(logger):
+	#~ f=open(sys.stdout) 	
