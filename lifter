@@ -43,6 +43,13 @@ with open(sys.argv[1]) as m:
 			lambda_map[0].append(c)
 
 lambda_map.pop(0)
+#padding with ' '
+maxcol = max([len(lambda_map[i]) for i,v in enumerate(lambda_map)])
+print maxcol
+for i, val in enumerate(lambda_map):
+	if len(lambda_map[i]) != maxcol:
+		val.extend([' ' for padder in range(maxcol - len(val)+1)])
+	
 
 print "Map displayed by Displayer"
 displayer=MapDrawer(lambda_map)
