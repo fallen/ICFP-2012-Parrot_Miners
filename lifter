@@ -2,6 +2,7 @@
 # -*- indent-tabs-mode: t -*-
 
 import sys
+from mapupdater import controller
 
 lambda_map = [[]]
 line = sys.stdin.read()
@@ -15,6 +16,11 @@ while line != "":
 	line = sys.stdin.read()
 
 lambda_map.pop(0)
+
+
+cont = controller(lambda_map)
+#example :
+cont.set_movement('R')
 print lambda_map
 
 
