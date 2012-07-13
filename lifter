@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- indent-tabs-mode: t -*-
 
+
 import sys, termios, tty, os, signal, time
+from displayer import MapDrawer
 from mapupdater import controller
 
 def reset_tty_and_exit():
@@ -23,6 +25,7 @@ def handler(signum, frame):
 signal.signal(signal.SIGINT, handler)
 signal.signal(signal.SIGTERM, handler)
 
+
 lambda_map = [[]]
 
 if len(sys.argv) == 1:
@@ -38,7 +41,13 @@ with open(sys.argv[1]) as m:
 			lambda_map[0].append(c)
 
 lambda_map.pop(0)
-print lambda_map
+
+print "Map displayed by Displayer"
+displayer=MapDrawer(lambda_map)
+displayer.draw()
+
+
+#print lambda_map
 
 cont = controller(lambda_map)
 while 1:
