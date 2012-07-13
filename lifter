@@ -46,6 +46,8 @@ print "Map displayed by Displayer"
 displayer=MapDrawer(lambda_map)
 displayer.draw()
 
+#Now lambda_map is "reindexed"
+lambda_map=displayer.getmap()
 
 #print lambda_map
 

@@ -27,6 +27,9 @@ class MapDrawer:
 		lambda_indexed.reverse()
 		self.lambda_map=lambda_indexed
 
+	def getmap(self):
+		return self.lambda_map
+
 	def draw(self):
 		map_str=""
 		list_lines=[]

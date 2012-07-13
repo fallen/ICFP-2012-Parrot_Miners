@@ -28,11 +28,11 @@ class controller:
 					if self.lambda_map[x][y-1] == '*' and (self.lambda_map[x+1][y] != ' ' or self.lambda_map[x+1][y-1] != ' ') and self.lambda_map[x-1][y] == ' ' and self.lambda_map[x-1][y-1] == ' ':
 						new_map[x][y] = ' '
 						new_map[x-1][y-1] = ' '
-					if self.lambda_map[x][y-1] == '\\' and self.lambda_map[x+1][y] == ' ' self.lambda_map[x+1][y-1] == ' ':
+					if self.lambda_map[x][y-1] == '\\' and self.lambda_map[x+1][y] == ' ' and self.lambda_map[x+1][y-1] == ' ':
 						new_map[x][y] = ' '
 						new_map[x+1][y-1] = '*'
 				
-				if self.lambda_map[x][y] == 'L' and self.lambdas.is_empty():
+				if self.lambda_map[x][y] == 'L' and len(self.lambdas) == 0:
 					self.lambda_map[x][y] == 'o'
 						
 						
