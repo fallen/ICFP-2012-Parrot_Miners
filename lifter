@@ -11,10 +11,17 @@ while line != "":
 	for c in line:
 		if c == '\n':
 			m+=1
-			lambda_map.append([])
+			lambda_map.insert(0,[])
 			continue
-		lambda_map[m].append(c)
+		lambda_map[0].append(c)
 	line = sys.stdin.read()
 
+lambda_map.pop(0)
+print lambda_map
 
-print lambda_map	
+#~ temp_map = lambda_map
+#~ lambda_map = [[]]
+#~ for m in range(len(temp_map)-1):
+	#~ lambda_map.append(temp_map[len(temp_map)-m])
+	
+
