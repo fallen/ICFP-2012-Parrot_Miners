@@ -31,11 +31,22 @@ signal.signal(signal.SIGTERM, handler)
 
 lambda_map = [[]]
 
-if len(sys.argv) == 1:
-	print "usage: ", sys.argv[0], " <map_file_map>"
+if len(sys.argv) != 1 and len(sys.argv) != 3:
+	print "usage: ", sys.argv[0], " debug <map_file_map>"
+	print "       or ",sys.argv[0]," < <map_file_map>"
 	exit(1)
 
-with open(sys.argv[1]) as m:
+if len(sys.argv) == 3:
+	debug = True
+else:
+	debug = False
+	
+if debug :
+	f = open(sys.argv[2])
+else:
+	f = sys.stdin
+	
+with f as m:
 	for line in m:
 		for c in line:
 			if c == '\n':
@@ -52,12 +63,13 @@ for i, val in enumerate(lambda_map):
 		val.extend([' ' for padder in range(maxcol - len(val)+1)])
 	
 
-print "Map displayed by Displayer"
 displayer=MapDrawer(lambda_map)
 #Now lambda_map is "reindexed"
 lambda_map=displayer.getmap()
 
-displayer.draw()
+if debug :
+	os.system("clear")
+	displayer.draw()
 
 world = world(lambda_map)
 control = kcontroler(lambda_map)
@@ -65,7 +77,8 @@ control = kcontroler(lambda_map)
 # This allows stdin.read() to be unbuffered
 # which means read(1) will return, even without any \n
 
-while 1:
-
-	world.set_movement(control.get_next())
-	displayer.draw()
+if debug:
+	while 1:
+		world.set_movement(control.get_next())
+		os.system("clear")
+		displayer.draw()

@@ -17,7 +17,6 @@ class kcontroler(controler):
 	# in raw terminal mode CTRL+C is ASCII code 0x03
 	# We exit upon CTRL+C
 		if key == ' ':
-			termios.tcsetattr(fd, termios.TCSANOW, old_settings)
 			os.system("reset")
 			sys.exit(0)
 		
