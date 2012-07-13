@@ -11,9 +11,6 @@ class controller:
 					self.robotpos = (x,y)
 				if self.lambda_map[x][y] == '\\':
 					self.lambdas.append((x,y))
-					
-		print self.robotpos
-		print self.lambdas
 				 
 	def single_round(self):
 		#allocate
@@ -45,9 +42,7 @@ class controller:
 	def move(self, x,y, xp,yp):
 		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o':
 			if self.lambda_map[xp][yp] == '\\':
-				print "eat a lambda"
 				self.lambdas.remove((xp,yp))
-			print "go normally"
 			self.lambda_map[xp][yp] = 'R'
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
@@ -57,36 +52,27 @@ class controller:
 			self.lambda_map[xp+1][yp] = '*'
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
-			print "push a boulder"
 			return True
 		elif xp == x-1 and self.lambda_map[xp][yp] == '*' and self.lambda_map[x-2][y] == ' ':
 			self.lambda_map[xp][yp] = 'R'
 			self.lambda_map[xp-1][yp] = '*'
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
-			print "push a boulder"
 			return True
 		else :
 			return False
 		
 	def set_movement(self, move):
 		if move == "U":
-			print "up"
-			print self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]+1)
+			self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]+1)
 		if move == "D":
-			print "down"
-			print self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]-1)
+			self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]-1)
 		if move == "L":
-			print "left"
-			print self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]-1, self.robotpos[1])
+			self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]-1, self.robotpos[1])
 		if move == "R":
-			print "right"
-			print self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]+1, self.robotpos[1])
+			self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]+1, self.robotpos[1])
 		if move == "A":
-			print "abort"
 			pass
 		if move == "W":
-			print "wait"
 			pass
 		self.single_round()
-		print self.robotpos
