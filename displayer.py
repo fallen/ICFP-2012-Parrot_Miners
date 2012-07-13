@@ -4,6 +4,7 @@
 
 class MapDrawer:
 	def __init__(self,lambda_map):
+		#Map from input uses first index for lines, we want it for columns
 		self.height=len(lambda_map)
 		self.width=len(lambda_map[0])
 		
@@ -27,7 +28,6 @@ class MapDrawer:
 		map_str=""
 		list_lines=[]
 		# ''.join(list_of_chars_or_strings) -> create a big string :)
-		x_no=0
 		for y in range(self.height):
 			for x in range(self.width):
 				map_str+=(self.lambda_map[x][self.height - y-1])
