@@ -44,7 +44,7 @@ class controller:
 						self.am_i_dead((x+1,y-1))
 				# No lambdas left, opening lift
 				if self.lambda_map[x][y] == 'L' and len(self.lambdas) == 0:
-					self.lambda_map[x][y] == 'O'
+					self.lambda_map[x][y] = 'O'
 						
 		for x in range(len(new_map)):
 			for y in range(len(new_map[x])):			
