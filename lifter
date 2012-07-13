@@ -12,11 +12,9 @@ while line != "":
 		if c == '\n':
 			m+=1
 			lambda_map.append([])
+			continue
 		lambda_map[m].append(c)
 	line = sys.stdin.read()
 
+
 print lambda_map	
-#~ for o in range(len(lambda_map)):
-	#~ for p in range(len(lambda_map[o])):
-		#~ print lambda_map[o][p]
-	#~ print "\n"
