@@ -5,12 +5,10 @@ import sys
 
 lambda_map = [[]]
 line = sys.stdin.read()
-m=0
 while line != "":
 	print line
 	for c in line:
 		if c == '\n':
-			m+=1
 			lambda_map.insert(0,[])
 			continue
 		lambda_map[0].append(c)
@@ -19,9 +17,4 @@ while line != "":
 lambda_map.pop(0)
 print lambda_map
 
-#~ temp_map = lambda_map
-#~ lambda_map = [[]]
-#~ for m in range(len(temp_map)-1):
-	#~ lambda_map.append(temp_map[len(temp_map)-m])
-	
 
