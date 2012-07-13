@@ -46,29 +46,30 @@ lambda_map.pop(0)
 
 print "Map displayed by Displayer"
 displayer=MapDrawer(lambda_map)
-displayer.draw()
-
 #Now lambda_map is "reindexed"
 lambda_map=displayer.getmap()
 
-#print lambda_map
+displayer.draw()
 
 cont = controller(lambda_map)
 
 # We set terminal in raw mode to catch single key events
 # This allows stdin.read() to be unbuffered
 # which means read(1) will return, even without any \n
-fd = sys.stdin.fileno()
-old_settings = termios.tcgetattr(fd)
-tty.setraw(fd)
+
 while 1:
+	fd = sys.stdin.fileno()
+	old_settings = termios.tcgetattr(fd)
+	tty.setraw(fd)
 	key = sys.stdin.read(1)
+	termios.tcsetattr(fd, termios.TCSANOW, old_settings)
 # in raw terminal mode CTRL+C is ASCII code 0x03
 # We exit upon CTRL+C
-	if key == chr(3):
+	if key == ' ':
 		termios.tcsetattr(fd, termios.TCSANOW, old_settings)
 		os.system("reset")
 		sys.exit(0)
+	
 	if key == "z":
 		cont.set_movement("U")
 	if key == "s":
@@ -81,4 +82,5 @@ while 1:
 		cont.set_movement("A")
 	if key == "w":
 		cont.set_movement("W")
-	print key
+
+	displayer.draw()
