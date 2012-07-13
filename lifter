@@ -1,8 +1,27 @@
 #!/usr/bin/env python
 # -*- indent-tabs-mode: t -*-
 
-import sys, termios, tty, os
+import sys, termios, tty, os, signal, time
 from mapupdater import controller
+
+def reset_tty_and_exit():
+	termios.tcsetattr(fd, termios.TCSANOW, old_settings)
+	os.system("reset")
+	sys.exit(0)
+
+def handler(signum, frame):
+	print 'Signal ', signum, 'catched'
+	if signum == signal.SIGINT:
+		print 'SIGINT, we exit !'
+		time.sleep(2)
+		reset_tty_and_exit()
+	if signum == signal.SIGTERM:
+		print 'SIGTERM, we exit as well, did we miss SIGINT ??'
+		time.sleep(2)
+		reset_tty_and_exit()
+
+signal.signal(signal.SIGINT, handler)
+signal.signal(signal.SIGTERM, handler)
 
 lambda_map = [[]]
 
@@ -29,5 +48,3 @@ while 1:
 		sys.exit(0)
 	cont.set_movement(key)
 	print key
-
-
