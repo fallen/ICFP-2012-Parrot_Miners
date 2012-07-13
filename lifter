@@ -25,7 +25,11 @@ signal.signal(signal.SIGTERM, handler)
 
 lambda_map = [[]]
 
-with open("maps/contest1.map") as m:
+if len(sys.argv) == 1:
+	print "usage: ", sys.argv[0], " <map_file_map>"
+	exit(1)
+
+with open(sys.argv[1]) as m:
 	for line in m:
 		for c in line:
 			if c == '\n':
