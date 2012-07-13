@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+# -*- indent-tabs-mode: t -*-
+
+import sys
+
+lambda_map = [[]]
+line = sys.stdin.read()
+m=0
+while line != "":
+	print line
+	for c in line:
+		if c == '\n':
+			m+=1
+			lambda_map.append([])
+		lambda_map[m].append(c)
+	line = sys.stdin.read()
+
+print lambda_map	
+#~ for o in range(len(lambda_map)):
+	#~ for p in range(len(lambda_map[o])):
+		#~ print lambda_map[o][p]
+	#~ print "\n"
