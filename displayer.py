@@ -14,9 +14,7 @@ class MapDrawer:
 
 #change indexing in matrix to be able to use lambda_map[x][y]
 	def reindex(self):
-		
-		lambda_indexed=[[ 'X' for i in range(self.width)] for i in range(self.height) ]
-
+		lambda_indexed=[[ 'X' for i in range(self.height)] for i in range(self.width) ]
 		for i in range(self.width):
 			for j in range(self.height):
 				lambda_indexed[i][j]=self.lambda_map[j][i]
