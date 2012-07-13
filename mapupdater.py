@@ -4,7 +4,14 @@ class controller:
 	
 	def __init__(self, lambda_map):
 		self.lambda_map = lambda_map
-	
+		self.lambdas = []
+		for x in range(len(self.lambda_map)):
+			for y in range(len(self.lambda_map[x])):
+				if self.lambda_map[x][y] == 'R':
+					self.robotpos = (x,y)
+				if self.lambda_map[x][y] == '\\':
+					self.lambdas.append((x,y))
+				 
 	def single_round(self):
 		#allocate
 		new_map = copy.deepcopy(self.lambda_map)
@@ -21,6 +28,13 @@ class controller:
 					if self.lambda_map[x][y-1] == '*' and (self.lambda_map[x+1][y] != ' ' or self.lambda_map[x+1][y-1] != ' ') and self.lambda_map[x-1][y] == ' ' and self.lambda_map[x-1][y-1] == ' ':
 						new_map[x][y] = ' '
 						new_map[x-1][y-1] = ' '
+					if self.lambda_map[x][y-1] == '\\' and self.lambda_map[x+1][y] == ' ' self.lambda_map[x+1][y-1] == ' ':
+						new_map[x][y] = ' '
+						new_map[x+1][y-1] = '*'
+				
+				if self.lambda_map[x][y] == 'L' and self.lambdas.is_empty():
+					self.lambda_map[x][y] == 'o'
+						
 						
 		self.lambda_map = new_map
 		
