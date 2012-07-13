@@ -34,7 +34,7 @@ class controller:
 						new_map[x+1][y-1] = '*'
 				
 				if self.lambda_map[x][y] == 'L' and len(self.lambdas) == 0:
-					self.lambda_map[x][y] == 'o'
+					self.lambda_map[x][y] == 'O'
 						
 		for x in range(len(new_map)):
 			for y in range(len(new_map[x])):			
