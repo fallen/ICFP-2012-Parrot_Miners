@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- indent-tabs-mode: t -*-
 
-
 class MapDrawer:
 	def __init__(self,lambda_map):
 		#Map from input uses first index for lines, we want it for columns
@@ -22,12 +21,13 @@ class MapDrawer:
 		return self.lambda_map
 
 	def draw(self):
-		map_str=""
-		list_lines=[]
-		# ''.join(list_of_chars_or_strings) -> create a big string :)
+		self.map_str=""
+		self.list_lines=[]
+		self.height=len(self.lambda_map[0])
+		self.width=len(self.lambda_map)
 		for y in range(self.height):
 			for x in range(self.width):
-				map_str+=(self.lambda_map[x][self.height - y-1])
-			map_str+=('\n')
-		print map_str
+				self.map_str+=(self.lambda_map[x][self.height - y-1])
+			self.map_str+=('\n')
+		print self.map_str
 
