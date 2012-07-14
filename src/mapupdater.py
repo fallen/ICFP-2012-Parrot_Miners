@@ -18,22 +18,17 @@ class world:
 		self.possible_trampolines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 		self.trampoline_position = {}
 
-		print "WE INSTANTIATE A WORLD"
-	
 		for x in range(len(self.lambda_map)):
 			for y in range(len(self.lambda_map[x])):
 				# if this is a trampoline target
 				if self.lambda_map[x][y].isdigit() and int(self.lambda_map[x][y]) > 0:
-					print self.lambda_map[x][y], " is a possible_target"
 					# we search wich trampoline it is the target of
 					for trampoline, target in self.trampolines.iteritems():
-						if target == int(lambda_map[x][y]):
-							print "We replace ", self.trampolines[trampoline], " with ", (x, y)
+						if target == int(self.lambda_map[x][y]):
 							# We replace target number by the target coordinates
 							# Target number is no longer needed
 							self.trampolines[trampoline] = (x, y)
 				if self.lambda_map[x][y] in self.possible_trampolines:
-					print "We register position of tramp ", self.lambda_map[x][y], " : ", x, y
 					self.trampoline_position[self.lambda_map[x][y]] = (x,y)
 					
 				if self.lambda_map[x][y] == 'R':
@@ -143,18 +138,10 @@ class world:
 			self.lambda_map[x][y] = ' '
 			# Searching for other trampolines targetting the same target
 			# in order to delete them
-#			for key, coord in self.trampolines.iteritems():
-#				if (a, b) == coord:
-#					del self.trampolines[key]
 			for trampoline in self.trampolines.keys():
-				print "Testing trampoline", trampoline
 				if self.trampolines[trampoline] == (a,b):
-					print "We spotted tramp targetting ", a, b 
 					(tx, ty) = self.trampoline_position[trampoline]
-					print "We delete tramp at ", tx, ty
 					self.lambda_map[tx][ty] = ' '
-					print "self.trampolines : ", self.trampolines
-					print "self.trampoline_position : ", self.trampoline_position
 			return True
 					
 		else :

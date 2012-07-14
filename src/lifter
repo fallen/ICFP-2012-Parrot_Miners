@@ -139,6 +139,7 @@ with f as m:
 			trampoline_name = words[1]
 			target_number = int(words[3])
 			trampolines[trampoline_name] = target_number
+			continue
 		if line.strip() == "":
 			continue
 		for c in line:
