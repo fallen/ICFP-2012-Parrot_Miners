@@ -57,9 +57,14 @@ class explorerstate:
 		
 	def explore(self, move):
 		cworld = copy.deepcopy(self.world)
-		cworld.set_movement(move)
-		self.actionsresults[move] = cworld
-		self.actionspoints[move] = cworld.get_points()
+		moved = cworld.set_movement(move)
+		if moved:
+			self.actionsresults[move] = cworld
+			self.actionspoints[move] = cworld.get_points()
+		else:
+			self.actionsresults[move] = None
+			self.actionspoints[move] = None
+		return moved
 		
 		
 		
@@ -72,21 +77,26 @@ class botcontroler(controler):
 		self.ASV = {}
 		self.ASV[world] = explorerstate(world)
 		for action in self.actions:
-				self.ASV[world].explore(action)
+				if self.ASV[world].explore(action):
+					self.ASV[self.ASV[world].actionsresults[action]] = explorerstate(self.ASV[world].actionsresults[action])
 	
 			
 	def explore_step(self):
 		pdb.set_trace()
 		world = self.world
 		random.seed = time.clock()
-		randmove = self.actions[random.randint(0,len(self.actions))]
+		#~ randmove = self.actions[random.randint(0,len(self.actions)-1)]
 		updatable_world = None
 		while world in self.ASV:
 			if len(self.ASV[world].actionsresults) == 0:
 				updatable_world = world
 				break
-			randmove = self.actions[random.randint(len(self.actions))]
-			world = self.ASV[world].actionresults[randmove]
+			randmove = self.actions[random.randint(0,len(self.actions)-1)]
+			try_world = self.ASV[world].actionsresults[randmove]
+			while try_world == None:
+				randmove = self.actions[random.randint(0,len(self.actions)-1)]
+				try_world = self.ASV[world].actionsresults[randmove]
+			world = try_world
 			
 		if updatable_world:	
 			self.ASV[updatable_world] = explorerstate(updatable_world)

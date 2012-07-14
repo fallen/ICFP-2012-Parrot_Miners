@@ -116,23 +116,24 @@ class world:
 	
 	def set_movement(self, move):
 		self.last_points=0
+		moved = False
 		if move == "U":
-			self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]+1)
+			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]+1)
 		if move == "D":
-			self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]-1)
+			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]-1)
 		if move == "L":
-			self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]-1, self.robotpos[1])
+			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]-1, self.robotpos[1])
 		if move == "R":
-			self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]+1, self.robotpos[1])
+			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]+1, self.robotpos[1])
 		if move == "A":
-			pass
+			moved = True
 		if move == "W":
 			pass
 		#~ self.logger.write(move)
-		self.single_round()
+		updated = self.single_round()
 		if self.waterworld != None:
 			self.waterworld.tick(self.robotpos[1])
-		return self.lambda_map
+		return moved or updated
 			
 
 
