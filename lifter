@@ -35,8 +35,24 @@ def handler(signum, frame):
 	print 'Signal ', signum, 'catched'
 	if signum == signal.SIGINT:
 		print 'SIGINT, we exit !'
-		cont.set_movement("A")
-		reset_tty_and_exit()
+		score = 0
+		while 1:
+			try:
+				world.set_movement(control.get_next())
+				score += world.get_points()
+				os.system("clear")
+				displayer.draw()
+				time.sleep(1)
+				world.print_status()
+				if world.killed:
+					print "lost"
+					reset_tty_and_exit()
+				elif world.won:
+					print score
+					reset_tty_and_exit()
+			except:
+				SimulatorDieEvent.stop_that.set()
+				raise
 	if signum == signal.SIGTERM:
 		print 'SIGTERM, we exit as well, did we miss SIGINT ??'
 		cont.set_movement("A")
@@ -166,20 +182,4 @@ if debug and sys.argv[1] == "botcontroler":
 		except:
 			SimulatorDieEvent.stop_that.set()
 			raise
-	while 1:
-		try:
-			world.set_movement(control.get_next())
-			score += world.get_points()
-			os.system("clear")
-			displayer.draw()
-			time.sleep(1)
-			world.print_status()
-			if world.killed:
-				print "lost"
-				reset_tty_and_exit()
-			elif world.won:
-				print score
-				reset_tty_and_exit()
-		except:
-			SimulatorDieEvent.stop_that.set()
-			raise
+	

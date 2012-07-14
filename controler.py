@@ -68,10 +68,10 @@ class explorerstate:
 	
 	def __str__(self):
 		MapDrawer(self.world.lambda_map).draw()
-		for key, value in self.actionsresults.iteritems():
-			print key, " : "
-			if value != None:
-				MapDrawer(value.lambda_map).draw()
+		#~ for key, value in self.actionsresults.iteritems():
+			#~ print key, " : "
+			#~ if value != None:
+				#~ MapDrawer(value.lambda_map).draw()
 		print "hope : ", self.hope
 		return ""
 			
@@ -82,7 +82,7 @@ class botcontroler(controler):
 	
 	def __init__(self, world):
 		controler.__init__(self, world)
-		self.actions = ["U", "R", "L", "D", "A", "W"]
+		self.actions = ["U", "R", "L", "D"]
 		self.ASV = {}
 		self.ASV[world] = explorerstate(world)
 		for action in self.actions:
@@ -139,11 +139,10 @@ class botcontroler(controler):
 							value.hope = hopemove
 							value.maxhopeaction = move
 							updated = True
-		
+		#~ pdb.set_trace()
 		return updated
 		
 	def get_next(self):
-		pdb.set_trace()
 		world = self.world
 		action = self.ASV[world].maxhopeaction
 		self.world = self.ASV[world].actionsresults[action]
