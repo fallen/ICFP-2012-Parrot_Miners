@@ -113,6 +113,8 @@ class world:
 	
 	def set_movement(self, move):
 		self.last_points=0
+		if (self.killed):
+			return False
 		moved = False
 		if move == "U":
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]+1)
