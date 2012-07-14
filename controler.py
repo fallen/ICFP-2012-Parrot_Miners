@@ -2,6 +2,8 @@ import sys, os,  tty, termios
 import copy
 from mapupdater import world
 from threading import Event
+import random
+import time
 
 class SimulatorDieEvent:
 	stop_that=Event()
@@ -43,38 +45,76 @@ class kcontroler(controler):
 			return "W"
 			
 
-class explorer:
+class explorerstate:
 	def __init__(self, world):
-		self.world = copy.deepcopy(world)
+		self.world = world
+		self.actionsresults = {}
 		self.actionspoints = {}
+		self.hope = 0
+		self.maxhopeaction = "W"
 		
 	def explore(self, move):
-		cworld = self.world
+		cworld = copy.deepcopy(world)
 		cworld.set_movement(move)
+		self.actionsresults[move] = cworld
+		self.actionspoints[move] = cworld.get_points()
+		
+		
+		
 	
 class botcontroler(controler):
 	
 	def __init__(self, world):
 		controler.__init__(self, world)
-		#~ ASF is Action State Value
-		self.actions = ["U", "R", "L", "D"]
+		self.actions = ["U", "R", "L", "D", "A", "W"]
 		self.ASV = {}
-		for action in self.actions:
-			self.ASV[(action, world.lambda_map)] = 0
 	
-	def explore_step(self, move, world):
-		cworld = copy.deepcopy(world)
-		cworld.set_movement(move)
-		self.ASV[(move, world.lambda_map)] += cworld.get_points()
+	def explore_step(self):
+		world = self.world
+		rand = random()
+		rand.seed = time.clock()
+		randmove = self.actions[rand.randint(len(self.actions))]
+		updatable_world = None
+		while world in self.ASV:
+			if len(self.ASV[world].actionsresults) == 0:
+				updatable_world = world
+				break
+			randmove = self.actions[rand.randint(len(self.actions))]
+			world = self.ASV[world].actionresults[randmove]
+			
+		if updatable_world:	
+			self.ASV[updatable_world] = explorerstate(updatable_world)
+			for action in self.actions:
+				self.ASV[updatable_world].explore(action)
+			return True
+		else:
+			return False
+			
+		
+	def update(self):
+		#update each cell in reverse
+		updated = False
+		for value in reversed(self.ASV.values()):
+			for move in self.actions:
+				hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
+				if hopemove > value.hope:
+					value.hope = hopemove
+					value.maxhopeaction = move
+					updated = True
+
+		#and normal order
+		for value in enumerate(self.ASV.values()):
+			for move in self.actions:
+				hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
+				if hopemove > value.hope:
+					value.hope = hopemove
+					value.maxhopeaction = move
+					updated = True
+					
+		return updated
 		
 	def get_next(self):
-		#~ exp = explorer(
-		maxikey = key = "W"
-		maxi = -1500
-		for index, value in enumerate(self.actions):
-			self.actionspoints[value] = self.explore(value)
-			if maxi < self.actionspoints[value]:
-				maxi = self.actionspoints[value]
-				maxikey = value
-		
-		return maxikey
+		world = self.world
+		action = self.ASV[world].maxhopeaction
+		self.world = self.ASV[world].actionsresults[action]
+		return action

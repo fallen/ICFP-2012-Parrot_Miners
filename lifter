@@ -9,6 +9,12 @@ from displayer import MapDrawer
 from mapupdater import world
 from controler import controler, kcontroler, botcontroler, SimulatorDieEvent
 
+
+if len(sys.argv) != 1 and len(sys.argv) != 3:
+	print "usage: ", sys.argv[0], " debug <map_file_map>"
+	print "       or ",sys.argv[0]," < <map_file_map>"
+	exit(1)
+	
 if len(sys.argv) == 3:
 	debug = True
 else:
@@ -17,7 +23,7 @@ else:
 def reset_tty_and_exit():
 	#termios.tcsetattr(fd, termios.TCSANOW, old_settings)
 	SimulatorDieEvent.stop_that.set()
-	os.system("reset")
+	#~ os.system("reset")
 	time.sleep(1)
 	sys.exit(0)
 	
@@ -66,13 +72,6 @@ if debug:
 
 
 lambda_map = [[]]
-
-if len(sys.argv) != 1 and len(sys.argv) != 3:
-	print "usage: ", sys.argv[0], " debug <map_file_map>"
-	print "       or ",sys.argv[0]," < <map_file_map>"
-	exit(1)
-
-
 
 
 if debug :
@@ -123,7 +122,11 @@ lambda_map=displayer.getmap()
 
 waterstuff=(water_value,flooding_value,waterproof_value)
 world = world(lambda_map, waterstuff)
-control = kcontroler(lambda_map)
+if sys.argv[1] == "kcontroler":
+	control = kcontroler(world)
+elif sys.argv[1] == "botcontroler":
+	control = botcontroler(world)
+	
 
 if debug :
 	os.system("clear")
@@ -136,13 +139,38 @@ if debug :
 # which means read(1) will return, even without any \n
 
 
-if debug:
+if debug and sys.argv[1] == "kcontroler":
 	score = 0
 	while 1:
 		world.set_movement(control.get_next())
 		score += world.get_points()
 		os.system("clear")
 		displayer.draw()
+		world.print_status()
+		if world.killed:
+			print "lost"
+			reset_tty_and_exit()
+		elif world.won:
+			print score
+			reset_tty_and_exit()
+
+if debug and sys.argv[1] == "botcontroler":
+	score = 0
+	while 1:
+		try:
+			explore_state = control.explore_step()
+			update_state = control.update()
+			if not explore_state and not update_state:
+				break
+		except:
+			SimulatorDieEvent.stop_that.set()
+			raise
+	while 1:
+		world.set_movement(control.get_next())
+		score += world.get_points()
+		os.system("clear")
+		displayer.draw()
+		time.sleep(1)
 		world.print_status()
 		if world.killed:
 			print "lost"
