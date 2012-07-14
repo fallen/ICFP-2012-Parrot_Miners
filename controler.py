@@ -56,7 +56,6 @@ class explorerstate:
 		self.maxhopeaction = "W"
 		
 	def explore(self, move):
-		
 		cworld = copy.deepcopy(self.world)
 		moved = cworld.set_movement(move)
 		if moved:
@@ -69,7 +68,6 @@ class explorerstate:
 	
 	def __str__(self):
 		MapDrawer(self.world.lambda_map).draw()
-		print self.actionsresults
 		for key, value in self.actionsresults.iteritems():
 			print key, " : "
 			if value != None:
