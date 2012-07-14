@@ -56,12 +56,17 @@ class explorerstate:
 		self.hope = 0
 		self.maxhopeaction = "W"
 		
-	def explore(self, move):
+	def explore(self, move, ASV=None):
 		cworld = copy.deepcopy(self.world)
 		moved = cworld.set_movement(move)
 		if moved:
-			self.actionsresults[move] = cworld
-			self.actionspoints[move] = cworld.get_points()
+			if hash_the_world(cworld) not in ASV:
+				self.actionsresults[move] = cworld
+				self.actionspoints[move] = cworld.get_points()
+			else:
+				self.actionsresults[move] = None
+				self.actionspoints[move] = None
+				return False
 		else:
 			self.actionsresults[move] = None
 			self.actionspoints[move] = None
@@ -74,6 +79,7 @@ class explorerstate:
 			#~ if value != None:
 				#~ MapDrawer(value.lambda_map).draw()
 		print "hope : ", self.hope
+		print "scoring :", self.actionspoints
 		return ""
 			
 def hash_the_world(world):
@@ -83,72 +89,82 @@ class botcontroler(controler):
 	
 	def __init__(self, world):
 		controler.__init__(self, world)
-		self.actions = ["U", "R", "L", "D"]
+		self.actions = ["U", "R", "L", "D","W"]
 		self.ASV = {}
 		self.ASV[hash_the_world(world)] = explorerstate(world)
 		for action in self.actions:
-			if self.ASV[hash_the_world(world)].explore(action):
+			if self.ASV[hash_the_world(world)].explore(action, self.ASV):
 				self.ASV[hash_the_world(self.ASV[hash_the_world(world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(world)].actionsresults[action])
+		self.update()
 	
 			
 	def explore_step(self):
+		ret = False
 		world = self.world
 		random.seed = time.clock()
-		#~ randmove = self.actions[random.randint(0,len(self.actions)-1)]
 		updatable_world = None
-		while hash_the_world(world) in self.ASV:
-			if len(self.ASV[hash_the_world(world)].actionsresults) == 0:
-				updatable_world = world
+		
+		for value in self.ASV.keys():
+			if len(self.ASV[value].actionsresults) == 0:
+				updatable_world = self.ASV[value].world
 				break
-			randmove = self.actions[random.randint(0,len(self.actions)-1)]
-			try_world = self.ASV[hash_the_world(world)].actionsresults[randmove]
-			while try_world == None:
-				randmove = self.actions[random.randint(0,len(self.actions)-1)]
-				try_world = self.ASV[hash_the_world(world)].actionsresults[randmove]
-			world = try_world
-			
+				
 		if updatable_world:	
 			for action in self.actions:
-				if self.ASV[hash_the_world(updatable_world)].explore(action):
+				if self.ASV[hash_the_world(updatable_world)].explore(action, self.ASV):
 					self.ASV[hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(updatable_world)].actionsresults[action])
+			#~ print "************* END ****************************"
+			#~ for value in self.ASV.values(): print value
+			#print len(self.ASV)
+			#~ print "*****************************************"
 			return True
 		else:
+			print "retfalse"
 			return False
 			
-		
-	def update(self):
-		#update each cell in reverse
-		updated = False
-		for value in reversed(self.ASV.values()):
-			hopemax = -1500
-			if len(value.actionsresults) > 0:
-				for move in value.actionsresults.keys():
-					if value.actionsresults[move] != None:
-						hopemove = value.actionspoints[move] + self.ASV[hash_the_world(value.actionsresults[move])].hope
-						if hopemove > hopemax:
-							hopemax = hopemove
-							value.maxhopeaction = move
-							updated = True
-						value.hope = hopemax
-
-		#and normal order
-		for value in self.ASV.values():
-			hopemax = -1500
-			if len(value.actionsresults) > 0:
-				for move in value.actionsresults.keys():
-					if value.actionsresults[move] != None:
-						hopemove = value.actionspoints[move] + self.ASV[hash_the_world(value.actionsresults[move])].hope
-						#~ print hopemove, hopemax
-						if hopemove > hopemax:
-							hopemax = hopemove
-							value.maxhopeaction = move
-							updated = True
-						value.hope = hopemax
+		#~ print "************* END ****************************"
 		#~ for value in self.ASV.values(): print value
 		#~ print len(self.ASV)
 		#~ print "*****************************************"
+		#pdb.set_trace()
+		return ret
+		
+	def recurse_update(self, world):
+		value = self.ASV[hash_the_world(world)]
+		if len(value.actionsresults) > 0:
+			hopemax = -1500
+			for move in value.actionsresults.keys():
+				if value.actionsresults[move] != None:
+					self.recurse_update(value.actionsresults[move])
+			#update value
+			for move in value.actionsresults.keys():
+				if value.actionsresults[move] != None:
+					hopemove = value.actionspoints[move] + self.ASV[hash_the_world(value.actionsresults[move])].hope
+					if hopemove > hopemax:
+							hopemax = hopemove
+							value.maxhopeaction = move
+							updated = True
+			value.hope = hopemax
+				
+				
+				#~ if value.actionsresults[move] != None and hash_the_world(value.actionsresults[move]) in self.ASV:
+						#~ hopemove = value.actionspoints[move] + self.ASV[hash_the_world(value.actionsresults[move])].hope
+					#	print hopemove, hopemax
+						#~ if hopemove > hopemax:
+							#~ hopemax = hopemove
+							#~ value.maxhopeaction = move
+							#~ updated = True
+				#~ value.hope = hopemax
+		#~ for value in self.ASV.values(): print value
+		#~ print len(self.ASV)
+		#~ print "*****************************************"
+		#~ print self.ASV[hash_the_world(self.world)]
 		#~ pdb.set_trace()
-		return updated
+		
+	def update(self):
+		#update each cell in reverse
+		self.recurse_update(self.world)
+		return True
 		
 	def get_next(self):
 		#for value in self.ASV.values(): print value

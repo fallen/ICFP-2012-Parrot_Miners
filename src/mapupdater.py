@@ -123,8 +123,9 @@ class world:
 		if move == "R":
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]+1, self.robotpos[1])
 		if move == "A":
-			moved = True
+			moved = False
 		if move == "W":
+			moved = True
 			pass
 		#~ self.logger.write(move)
 		updated = self.single_round()
