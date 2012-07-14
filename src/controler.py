@@ -8,6 +8,10 @@ from displayer import MapDrawer
 import pdb
 import hashlib
 
+			
+def hash_the_world(world):
+	return hashlib.sha1(world.lambda_map.__str__()).digest()
+	
 class SimulatorDieEvent:
 	stop_that=Event()
 	def __init__(self):
@@ -55,6 +59,7 @@ class explorerstate:
 		self.actionspoints = {}
 		self.hope = 0
 		self.maxhopeaction = "W"
+		self.visited = False
 		
 	def explore(self, move, ASV=None):
 		cworld = copy.deepcopy(self.world)
@@ -64,8 +69,8 @@ class explorerstate:
 				self.actionsresults[move] = cworld
 				self.actionspoints[move] = cworld.get_points()
 			else:
-				self.actionsresults[move] = None
-				self.actionspoints[move] = None
+				self.actionsresults[move] = ASV[hash_the_world(cworld)].world
+				self.actionspoints[move] = cworld.get_points()
 				return False
 		else:
 			self.actionsresults[move] = None
@@ -85,9 +90,7 @@ class explorerstate:
 		print "worlds :", self.actionsresults
 		
 		return ""
-			
-def hash_the_world(world):
-	return hashlib.sha1(world.lambda_map.__str__()).digest()
+
 
 class botcontroler(controler):
 	
@@ -137,12 +140,14 @@ class botcontroler(controler):
 		value = self.ASV[hash_the_world(world)]
 		if value.world.killed:
 			value.hope = -1500
+			value.visited = True
 			return
 		if len(value.actionsresults) > 0:
 			hopemax = -1500
 			for move in value.actionsresults.keys():
 				if value.actionsresults[move] != None:
-					self.recurse_update(value.actionsresults[move])
+					if not value.visited :
+						self.recurse_update(value.actionsresults[move])
 			#update value
 			for move in value.actionsresults.keys():
 				if value.actionsresults[move] != None:
@@ -150,8 +155,8 @@ class botcontroler(controler):
 					if hopemove > hopemax:
 							hopemax = hopemove
 							value.maxhopeaction = move
-							updated = True
 			value.hope = hopemax
+			value.visited = True
 				
 				
 				#~ if value.actionsresults[move] != None and hash_the_world(value.actionsresults[move]) in self.ASV:
@@ -170,6 +175,8 @@ class botcontroler(controler):
 		
 	def update(self):
 		#update each cell in reverse
+		for value in self.ASV.values():
+			value.visited = False
 		self.recurse_update(self.world)
 		return True
 		
@@ -183,8 +190,6 @@ class botcontroler(controler):
 		if hash_the_world(world) not in self.ASV:
 			return "A"
 		action = self.ASV[hash_the_world(world)].maxhopeaction
-		if action == "W":
-			action = "A"
-		else:
+		if action != "A":
 			self.world = self.ASV[hash_the_world(world)].actionsresults[action]
 		return action

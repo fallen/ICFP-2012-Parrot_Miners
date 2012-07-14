@@ -1,5 +1,6 @@
 import copy
 import sys
+import pdb
 
 class world:
 	
@@ -28,6 +29,7 @@ class world:
 		return self.last_points
 		
 	def single_round(self):
+		ret = False
 		#allocate
 		new_map = copy.deepcopy(self.lambda_map)
 		#set it to ''
@@ -38,29 +40,36 @@ class world:
 					if self.lambda_map[x][y-1] == ' ':
 						new_map[x][y] = ' '
 						new_map[x][y-1] = '*'
+						ret = True
 						self.am_i_dead((x,y-1))
 					#Rock rolling over rock to the right
 					if self.lambda_map[x][y-1] == '*' and self.lambda_map[x+1][y] == ' ' and self.lambda_map[x+1][y-1] == ' ':
 						new_map[x][y] = ' '
 						new_map[x+1][y-1] = '*'
+						ret = True
 						self.am_i_dead((x+1,y-1))
 					#Rock rolling over rock to the left
 					if self.lambda_map[x][y-1] == '*' and (self.lambda_map[x+1][y] != ' ' or self.lambda_map[x+1][y-1] != ' ') and self.lambda_map[x-1][y] == ' ' and self.lambda_map[x-1][y-1] == ' ':
 						new_map[x][y] = ' '
 						new_map[x-1][y-1] = '*'
+						ret = True
 						self.am_i_dead((x-1,y-1))
 					#Rock rolling over lambda to the right
 					if self.lambda_map[x][y-1] == '\\' and self.lambda_map[x+1][y] == ' ' and self.lambda_map[x+1][y-1] == ' ':
 						new_map[x][y] = ' '
 						new_map[x+1][y-1] = '*'
+						ret = True
 						self.am_i_dead((x+1,y-1))
 				# No lambdas left, opening lift
 				if self.lambda_map[x][y] == 'L' and len(self.lambdas) == 0:
+					ret = True
 					new_map[x][y] = 'O'
 						
 		for x in range(len(new_map)):
 			for y in range(len(new_map[x])):			
 				self.lambda_map[x][y] = new_map[x][y]
+		
+		return ret
 
 
 	#If i have a rock over my head that's just been moved there, i'm dead :<
@@ -136,6 +145,8 @@ class world:
 		if (self.killed):
 			self.last_points = -1500
 			return True
+		if move == "W" and updated:
+			pdb.set_trace()
 		return moved or updated
 			
 
