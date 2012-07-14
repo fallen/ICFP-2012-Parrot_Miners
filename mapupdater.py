@@ -85,7 +85,6 @@ class world:
 		self.last_points -= 1
 		print self.lambda_map[xp][yp]
 		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o':
-			print "if1"
 			if self.lambda_map[xp][yp] == '\\':
 				self.lambdas.remove((xp,yp))
 				self.last_points+=25
@@ -111,7 +110,6 @@ class world:
 			self.lambda_map[x][y] = ' '
 			return True
 		else :
-			print "else"
 			return False
 	
 	def set_movement(self, move):

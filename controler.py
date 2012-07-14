@@ -65,7 +65,15 @@ class explorerstate:
 			self.actionsresults[move] = None
 			self.actionspoints[move] = None
 		return moved
-		
+	
+	def __str__(self):
+		MapDrawer(self.world.lambda_map).draw()
+		for key, value in enumerate(self.actionsresults):
+			print key, " : "
+			MapDrawer(value.world.lambda_map).draw()
+			print "hope : ", value.hope
+		return ""
+			
 		
 		
 	
@@ -82,7 +90,6 @@ class botcontroler(controler):
 	
 			
 	def explore_step(self):
-		pdb.set_trace()
 		world = self.world
 		random.seed = time.clock()
 		#~ randmove = self.actions[random.randint(0,len(self.actions)-1)]
@@ -101,7 +108,8 @@ class botcontroler(controler):
 		if updatable_world:	
 			self.ASV[updatable_world] = explorerstate(updatable_world)
 			for action in self.actions:
-				self.ASV[updatable_world].explore(action)
+				if self.ASV[updatable_world].explore(action):
+					self.ASV[self.ASV[updatable_world].actionsresults[action]] = explorerstate(self.ASV[updatable_world].actionsresults[action])
 			return True
 		else:
 			return False
@@ -109,23 +117,26 @@ class botcontroler(controler):
 		
 	def update(self):
 		#update each cell in reverse
+		pdb.set_trace()
 		updated = False
 		for value in reversed(self.ASV.values()):
-			for move in self.actions:
-				hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
-				if hopemove > value.hope:
-					value.hope = hopemove
-					value.maxhopeaction = move
-					updated = True
+			if len(value.actionsresults) > 0:
+				for move in self.actions:
+					hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
+					if hopemove > value.hope:
+						value.hope = hopemove
+						value.maxhopeaction = move
+						updated = True
 
 		#and normal order
 		for value in enumerate(self.ASV.values()):
-			for move in self.actions:
-				hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
-				if hopemove > value.hope:
-					value.hope = hopemove
-					value.maxhopeaction = move
-					updated = True
+			if len(value.actionsresults) > 0:
+				for move in self.actions:
+					hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
+					if hopemove > value.hope:
+						value.hope = hopemove
+						value.maxhopeaction = move
+						updated = True
 					
 		return updated
 		
