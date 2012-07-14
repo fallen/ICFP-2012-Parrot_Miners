@@ -73,13 +73,17 @@ class explorerstate:
 		return moved
 	
 	def __str__(self):
+		print self.world
 		MapDrawer(self.world.lambda_map).draw()
 		#~ for key, value in self.actionsresults.iteritems():
 			#~ print key, " : "
 			#~ if value != None:
 				#~ MapDrawer(value.lambda_map).draw()
+		
 		print "hope : ", self.hope
 		print "scoring :", self.actionspoints
+		print "worlds :", self.actionsresults
+		
 		return ""
 			
 def hash_the_world(world):
@@ -109,7 +113,7 @@ class botcontroler(controler):
 				updatable_world = self.ASV[value].world
 				break
 				
-		if updatable_world:	
+		if updatable_world:
 			for action in self.actions:
 				if self.ASV[hash_the_world(updatable_world)].explore(action, self.ASV):
 					self.ASV[hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(updatable_world)].actionsresults[action])
@@ -131,6 +135,9 @@ class botcontroler(controler):
 		
 	def recurse_update(self, world):
 		value = self.ASV[hash_the_world(world)]
+		if value.world.killed:
+			value.hope = -1500
+			return
 		if len(value.actionsresults) > 0:
 			hopemax = -1500
 			for move in value.actionsresults.keys():
@@ -171,6 +178,7 @@ class botcontroler(controler):
 		#print len(self.ASV)
 		#~ print "*****************************************"
 		#~ print self.ASV[hash_the_world(self.world)]
+		#~ pdb.set_trace()
 		world = self.world
 		if hash_the_world(world) not in self.ASV:
 			return "A"

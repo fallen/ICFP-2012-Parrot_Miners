@@ -22,6 +22,7 @@ class world:
 					self.robotpos = (x,y)
 				if self.lambda_map[x][y] == '\\':
 					self.lambdas.append((x,y))
+		self.lambdasmax = len(self.lambdas)
 	
 	def get_points(self):
 		return self.last_points
@@ -104,6 +105,7 @@ class world:
 			self.robotpos = (xp,yp)
 			return True
 		elif self.lambda_map[xp][yp] == 'O':
+			self.last_points += 50 * self.lambdasmax
 			self.won = True
 			self.lambda_map[xp][yp] = 'R'
 			self.lambda_map[x][y] = ' '
@@ -132,7 +134,8 @@ class world:
 		if self.waterworld != None:
 			self.waterworld.tick(self.robotpos[1])
 		if (self.killed):
-			return False
+			self.last_points = -1500
+			return True
 		return moved or updated
 			
 
