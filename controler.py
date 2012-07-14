@@ -56,6 +56,7 @@ class explorerstate:
 		self.maxhopeaction = "W"
 		
 	def explore(self, move):
+		
 		cworld = copy.deepcopy(self.world)
 		moved = cworld.set_movement(move)
 		if moved:
@@ -68,10 +69,12 @@ class explorerstate:
 	
 	def __str__(self):
 		MapDrawer(self.world.lambda_map).draw()
-		for key, value in enumerate(self.actionsresults):
+		print self.actionsresults
+		for key, value in self.actionsresults.iteritems():
 			print key, " : "
-			MapDrawer(value.world.lambda_map).draw()
-			print "hope : ", value.hope
+			if value != None:
+				MapDrawer(value.lambda_map).draw()
+		print "hope : ", self.hope
 		return ""
 			
 		
@@ -106,7 +109,6 @@ class botcontroler(controler):
 			world = try_world
 			
 		if updatable_world:	
-			self.ASV[updatable_world] = explorerstate(updatable_world)
 			for action in self.actions:
 				if self.ASV[updatable_world].explore(action):
 					self.ASV[self.ASV[updatable_world].actionsresults[action]] = explorerstate(self.ASV[updatable_world].actionsresults[action])
@@ -117,11 +119,12 @@ class botcontroler(controler):
 		
 	def update(self):
 		#update each cell in reverse
-		pdb.set_trace()
 		updated = False
+		for value in self.ASV.values(): print value
+		pdb.set_trace()
 		for value in reversed(self.ASV.values()):
 			if len(value.actionsresults) > 0:
-				for move in self.actions:
+				for move in value.actionsresults.keys():
 					hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
 					if hopemove > value.hope:
 						value.hope = hopemove

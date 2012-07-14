@@ -83,7 +83,6 @@ class world:
 
 	def move(self, x,y, xp,yp):
 		self.last_points -= 1
-		print self.lambda_map[xp][yp]
 		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o':
 			if self.lambda_map[xp][yp] == '\\':
 				self.lambdas.remove((xp,yp))
