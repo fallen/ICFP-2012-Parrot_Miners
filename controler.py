@@ -6,6 +6,7 @@ import random
 import time
 from displayer import MapDrawer
 import pdb
+import hashlib
 
 class SimulatorDieEvent:
 	stop_that=Event()
@@ -75,19 +76,19 @@ class explorerstate:
 		print "hope : ", self.hope
 		return ""
 			
-		
-		
-	
+def hash_the_world(world):
+	return hashlib.sha1(world.lambda_map.__str__()).digest()
+
 class botcontroler(controler):
 	
 	def __init__(self, world):
 		controler.__init__(self, world)
 		self.actions = ["U", "R", "L", "D"]
 		self.ASV = {}
-		self.ASV[world] = explorerstate(world)
+		self.ASV[hash_the_world(world)] = explorerstate(world)
 		for action in self.actions:
-				if self.ASV[world].explore(action):
-					self.ASV[self.ASV[world].actionsresults[action]] = explorerstate(self.ASV[world].actionsresults[action])
+				if self.ASV[hash_the_world(world)].explore(action):
+					self.ASV[hash_the_world(self.ASV[hash_the_world(world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(world)].actionsresults[action])
 	
 			
 	def explore_step(self):
@@ -95,21 +96,21 @@ class botcontroler(controler):
 		random.seed = time.clock()
 		#~ randmove = self.actions[random.randint(0,len(self.actions)-1)]
 		updatable_world = None
-		while world in self.ASV:
-			if len(self.ASV[world].actionsresults) == 0:
+		while hash_the_world(world) in self.ASV:
+			if len(self.ASV[hash_the_world(world)].actionsresults) == 0:
 				updatable_world = world
 				break
 			randmove = self.actions[random.randint(0,len(self.actions)-1)]
-			try_world = self.ASV[world].actionsresults[randmove]
+			try_world = self.ASV[hash_the_world(world)].actionsresults[randmove]
 			while try_world == None:
 				randmove = self.actions[random.randint(0,len(self.actions)-1)]
-				try_world = self.ASV[world].actionsresults[randmove]
+				try_world = self.ASV[hash_the_world(world)].actionsresults[randmove]
 			world = try_world
 			
 		if updatable_world:	
 			for action in self.actions:
-				if self.ASV[updatable_world].explore(action):
-					self.ASV[self.ASV[updatable_world].actionsresults[action]] = explorerstate(self.ASV[updatable_world].actionsresults[action])
+				if self.ASV[hash_the_world(updatable_world)].explore(action):
+					self.ASV[hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(updatable_world)].actionsresults[action])
 			return True
 		else:
 			return False
@@ -123,7 +124,7 @@ class botcontroler(controler):
 			if len(value.actionsresults) > 0:
 				for move in value.actionsresults.keys():
 					if value.actionsresults[move] != None:
-						hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
+						hopemove = value.actionspoints[move] + self.ASV[hash_the_world(value.actionsresults[move])].hope
 						if hopemove > value.hope:
 							value.hope = hopemove
 							value.maxhopeaction = move
@@ -134,7 +135,7 @@ class botcontroler(controler):
 			if len(value.actionsresults) > 0:
 				for move in value.actionsresults.keys():
 					if value.actionsresults[move] != None:
-						hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
+						hopemove = value.actionspoints[move] + self.ASV[hash_the_world(value.actionsresults[move])].hope
 						if hopemove > value.hope:
 							value.hope = hopemove
 							value.maxhopeaction = move
@@ -144,6 +145,6 @@ class botcontroler(controler):
 		
 	def get_next(self):
 		world = self.world
-		action = self.ASV[world].maxhopeaction
-		self.world = self.ASV[world].actionsresults[action]
+		action = self.ASV[hash_the_world(world)].maxhopeaction
+		self.world = self.ASV[hash_the_world(world)].actionsresults[action]
 		return action
