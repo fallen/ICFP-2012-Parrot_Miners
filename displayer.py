@@ -7,7 +7,6 @@ class MapDrawer:
 		#Map from input uses first index for lines, we want it for columns
 		self.height=len(lambda_map)
 		self.width=len(lambda_map[0])
-		
 		#Here, lambda_map is "raw" ie. indexing came from input
 		self.lambda_map=lambda_map
 		self.reindex()

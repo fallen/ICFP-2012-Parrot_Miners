@@ -1,7 +1,12 @@
 import sys, os,  tty, termios
 import copy
 from mapupdater import world
+from threading import Event
 
+class SimulatorDieEvent:
+	stop_that=Event()
+	def __init__(self):
+		pass
 
 class controler:
 	def __init__(self, world):
@@ -21,6 +26,7 @@ class kcontroler(controler):
 	# We exit upon CTRL+C
 		if key == ' ':
 			os.system("reset")
+			SimulatorDieEvent.stop_that.set()
 			sys.exit(0)
 		
 		if key == "z":
