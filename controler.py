@@ -119,29 +119,31 @@ class botcontroler(controler):
 		#update each cell in reverse
 		updated = False
 		for value in self.ASV.values(): print value
-		pdb.set_trace()
 		for value in reversed(self.ASV.values()):
 			if len(value.actionsresults) > 0:
 				for move in value.actionsresults.keys():
-					hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
-					if hopemove > value.hope:
-						value.hope = hopemove
-						value.maxhopeaction = move
-						updated = True
+					if value.actionsresults[move] != None:
+						hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
+						if hopemove > value.hope:
+							value.hope = hopemove
+							value.maxhopeaction = move
+							updated = True
 
 		#and normal order
-		for value in enumerate(self.ASV.values()):
+		for value in self.ASV.values():
 			if len(value.actionsresults) > 0:
-				for move in self.actions:
-					hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
-					if hopemove > value.hope:
-						value.hope = hopemove
-						value.maxhopeaction = move
-						updated = True
-					
+				for move in value.actionsresults.keys():
+					if value.actionsresults[move] != None:
+						hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
+						if hopemove > value.hope:
+							value.hope = hopemove
+							value.maxhopeaction = move
+							updated = True
+		
 		return updated
 		
 	def get_next(self):
+		pdb.set_trace()
 		world = self.world
 		action = self.ASV[world].maxhopeaction
 		self.world = self.ASV[world].actionsresults[action]
