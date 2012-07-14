@@ -4,6 +4,8 @@ from mapupdater import world
 from threading import Event
 import random
 import time
+from displayer import MapDrawer
+import pdb
 
 class SimulatorDieEvent:
 	stop_that=Event()
@@ -54,7 +56,7 @@ class explorerstate:
 		self.maxhopeaction = "W"
 		
 	def explore(self, move):
-		cworld = copy.deepcopy(world)
+		cworld = copy.deepcopy(self.world)
 		cworld.set_movement(move)
 		self.actionsresults[move] = cworld
 		self.actionspoints[move] = cworld.get_points()
@@ -68,18 +70,22 @@ class botcontroler(controler):
 		controler.__init__(self, world)
 		self.actions = ["U", "R", "L", "D", "A", "W"]
 		self.ASV = {}
+		self.ASV[world] = explorerstate(world)
+		for action in self.actions:
+				self.ASV[world].explore(action)
 	
+			
 	def explore_step(self):
+		pdb.set_trace()
 		world = self.world
-		rand = random()
-		rand.seed = time.clock()
-		randmove = self.actions[rand.randint(len(self.actions))]
+		random.seed = time.clock()
+		randmove = self.actions[random.randint(0,len(self.actions))]
 		updatable_world = None
 		while world in self.ASV:
 			if len(self.ASV[world].actionsresults) == 0:
 				updatable_world = world
 				break
-			randmove = self.actions[rand.randint(len(self.actions))]
+			randmove = self.actions[random.randint(len(self.actions))]
 			world = self.ASV[world].actionresults[randmove]
 			
 		if updatable_world:	

@@ -166,15 +166,19 @@ if debug and sys.argv[1] == "botcontroler":
 			SimulatorDieEvent.stop_that.set()
 			raise
 	while 1:
-		world.set_movement(control.get_next())
-		score += world.get_points()
-		os.system("clear")
-		displayer.draw()
-		time.sleep(1)
-		world.print_status()
-		if world.killed:
-			print "lost"
-			reset_tty_and_exit()
-		elif world.won:
-			print score
-			reset_tty_and_exit()
+		try:
+			world.set_movement(control.get_next())
+			score += world.get_points()
+			os.system("clear")
+			displayer.draw()
+			time.sleep(1)
+			world.print_status()
+			if world.killed:
+				print "lost"
+				reset_tty_and_exit()
+			elif world.won:
+				print score
+				reset_tty_and_exit()
+		except:
+			SimulatorDieEvent.stop_that.set()
+			raise
