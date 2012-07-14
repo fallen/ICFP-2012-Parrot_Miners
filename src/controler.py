@@ -87,8 +87,8 @@ class botcontroler(controler):
 		self.ASV = {}
 		self.ASV[hash_the_world(world)] = explorerstate(world)
 		for action in self.actions:
-				if self.ASV[hash_the_world(world)].explore(action):
-					self.ASV[hash_the_world(self.ASV[hash_the_world(world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(world)].actionsresults[action])
+			if self.ASV[hash_the_world(world)].explore(action):
+				self.ASV[hash_the_world(self.ASV[hash_the_world(world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(world)].actionsresults[action])
 	
 			
 	def explore_step(self):
