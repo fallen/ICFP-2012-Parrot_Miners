@@ -61,18 +61,16 @@ class explorerstate:
 		if moved:
 			self.actionsresults[move] = cworld
 			self.actionspoints[move] = cworld.get_points()
-		else:
-			self.actionsresults[move] = None
-			self.actionspoints[move] = None
 		return moved
 	
 	def __str__(self):
 		MapDrawer(self.world.lambda_map).draw()
-		for key, value in enumerate(self.actionsresults):
-			print key, " : "
-			MapDrawer(value.world.lambda_map).draw()
-			print "hope : ", value.hope
-		return ""
+		if self.actionsresults != None:
+			for key, value in self.actionsresults.iteritems():
+				print key, " : "
+				MapDrawer(value.lambda_map).draw()
+			print "hope : ", self.hope
+			return ""
 			
 		
 		
@@ -85,6 +83,7 @@ class botcontroler(controler):
 		self.ASV = {}
 		self.ASV[world] = explorerstate(world)
 		for action in self.actions:
+				pdb.set_trace()
 				if self.ASV[world].explore(action):
 					self.ASV[self.ASV[world].actionsresults[action]] = explorerstate(self.ASV[world].actionsresults[action])
 	
@@ -117,7 +116,6 @@ class botcontroler(controler):
 		
 	def update(self):
 		#update each cell in reverse
-		pdb.set_trace()
 		updated = False
 		for value in reversed(self.ASV.values()):
 			if len(value.actionsresults) > 0:
@@ -131,7 +129,7 @@ class botcontroler(controler):
 		#and normal order
 		for value in enumerate(self.ASV.values()):
 			if len(value.actionsresults) > 0:
-				for move in self.actions:
+				for move in self.actionsresults.keys():
 					hopemove = value.actionspoints[move] + self.ASV[value.actionsresults[move]].hope
 					if hopemove > value.hope:
 						value.hope = hopemove
