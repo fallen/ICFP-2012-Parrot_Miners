@@ -148,8 +148,7 @@ lambda_map.pop(0)
 maxcol = max([len(lambda_map[i]) for i,v in enumerate(lambda_map)])
 for i, val in enumerate(lambda_map):
 	if len(lambda_map[i]) != maxcol:
-		val.extend([' ' for padder in range(maxcol - len(val)+1)])
-	
+		val.extend([' ' for padder in range(maxcol - len(val))])
 
 displayer=MapDrawer(lambda_map)
 displayer.reindex()
