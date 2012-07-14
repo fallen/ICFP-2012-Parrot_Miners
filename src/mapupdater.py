@@ -134,9 +134,10 @@ class world:
 		if move == "R":
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]+1, self.robotpos[1])
 		if move == "A":
-			moved = False
-		if move == "W":
+			self.last_points += 25 * (self.lambdasmax - len(self.lambdas)+1)
 			moved = True
+		if move == "W":
+			moved = False
 			pass
 		#~ self.logger.write(move)
 		updated = self.single_round()
@@ -145,8 +146,6 @@ class world:
 		if (self.killed):
 			self.last_points = -1500
 			return True
-		if move == "W" and updated:
-			pdb.set_trace()
 		return moved or updated
 			
 
