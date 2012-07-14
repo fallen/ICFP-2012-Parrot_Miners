@@ -8,6 +8,9 @@ from displayer import MapDrawer
 import pdb
 import hashlib
 
+def hash_the_world(world):
+	return hashlib.sha1(world.lambda_map.__str__()).digest()
+
 class SimulatorDieEvent:
 	stop_that=Event()
 	def __init__(self):
@@ -86,9 +89,6 @@ class explorerstate:
 		
 		return ""
 			
-def hash_the_world(world):
-	return hashlib.sha1(world.lambda_map.__str__()).digest()
-
 class botcontroler(controler):
 	
 	def __init__(self, world):

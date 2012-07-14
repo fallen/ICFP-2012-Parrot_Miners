@@ -2,22 +2,40 @@ import copy
 import sys
 
 class world:
-	
-	def __init__(self, lambda_map, waterstuff):
+
+	def __init__(self, lambda_map, waterstuff, trampolines):
 		self.lambda_map = lambda_map
 		self.lambdas = []
 		#~ self.logger = debuglogger()
 		self.won= False
 		self.last_points=0
-		
 		self.waterworld=None
 		self.killed=False
 		self.warning=""
 		self.death_cause=None
 		self.waterworld=waterworld(self,waterstuff)
-		
+		self.trampolines = trampolines
+		self.possible_trampolines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+		self.trampoline_position = {}
+
+		print "WE INSTANTIATE A WORLD"
+	
 		for x in range(len(self.lambda_map)):
 			for y in range(len(self.lambda_map[x])):
+				# if this is a trampoline target
+				if self.lambda_map[x][y].isdigit() and int(self.lambda_map[x][y]) > 0:
+					print self.lambda_map[x][y], " is a possible_target"
+					# we search wich trampoline it is the target of
+					for trampoline, target in self.trampolines.iteritems():
+						if target == int(lambda_map[x][y]):
+							print "We replace ", self.trampolines[trampoline], " with ", (x, y)
+							# We replace target number by the target coordinates
+							# Target number is no longer needed
+							self.trampolines[trampoline] = (x, y)
+				if self.lambda_map[x][y] in self.possible_trampolines:
+					print "We register position of tramp ", self.lambda_map[x][y], " : ", x, y
+					self.trampoline_position[self.lambda_map[x][y]] = (x,y)
+					
 				if self.lambda_map[x][y] == 'R':
 					self.robotpos = (x,y)
 				if self.lambda_map[x][y] == '\\':
@@ -108,8 +126,37 @@ class world:
 			self.last_points += 50 * self.lambdasmax
 			self.won = True
 			self.lambda_map[xp][yp] = 'R'
+			self.robotpos = (xp,yp)
 			self.lambda_map[x][y] = ' '
 			return True
+		elif self.lambda_map[xp][yp] in self.trampolines:
+			print self.lambda_map[xp][yp]
+			print self.trampolines[self.lambda_map[xp][yp]]
+			(a,b) = self.trampolines[self.lambda_map[xp][yp]]
+			del self.trampolines[self.lambda_map[xp][yp]]
+			self.robotpos = (a,b)
+			# Robot is teleported
+			self.lambda_map[a][b] = 'R'
+			# Hit trampoline disappears
+			self.lambda_map[xp][yp] = ' '
+			# Previous robot location is cleared
+			self.lambda_map[x][y] = ' '
+			# Searching for other trampolines targetting the same target
+			# in order to delete them
+#			for key, coord in self.trampolines.iteritems():
+#				if (a, b) == coord:
+#					del self.trampolines[key]
+			for trampoline in self.trampolines.keys():
+				print "Testing trampoline", trampoline
+				if self.trampolines[trampoline] == (a,b):
+					print "We spotted tramp targetting ", a, b 
+					(tx, ty) = self.trampoline_position[trampoline]
+					print "We delete tramp at ", tx, ty
+					self.lambda_map[tx][ty] = ' '
+					print "self.trampolines : ", self.trampolines
+					print "self.trampoline_position : ", self.trampoline_position
+			return True
+					
 		else :
 			return False
 	
@@ -195,7 +242,7 @@ class debuglogger(logger):
 		#~ print "write_to_file"
 		self.f.write(self.loggedstr)
 		#~ self.f.close()
-		
+
 class normallogger(logger):
 	
 	def __del__(self):
