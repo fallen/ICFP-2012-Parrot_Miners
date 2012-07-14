@@ -38,12 +38,16 @@ def handler(signum, frame):
 		score = 0
 		while 1:
 			try:
-				world.set_movement(control.get_next())
+				nextmove = control.get_next()
+				world.set_movement(nextmove)					
 				score += world.get_points()
 				os.system("clear")
 				displayer.draw()
 				time.sleep(1)
 				world.print_status()
+				if nextmove == "A":
+					print "abort"
+					reset_tty_and_exit()
 				if world.killed:
 					print "lost"
 					reset_tty_and_exit()
