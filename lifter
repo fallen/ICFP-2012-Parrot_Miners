@@ -115,6 +115,7 @@ for i, val in enumerate(lambda_map):
 	
 
 displayer=MapDrawer(lambda_map)
+displayer.reindex()
 #Now lambda_map is "reindexed"
 lambda_map=displayer.getmap()
 

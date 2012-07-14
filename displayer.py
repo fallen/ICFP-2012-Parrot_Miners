@@ -9,8 +9,6 @@ class MapDrawer:
 		self.width=len(lambda_map[0])
 		#Here, lambda_map is "raw" ie. indexing came from input
 		self.lambda_map=lambda_map
-		self.reindex()
-		#Now, lambda_map is reindexed to make more sense of lambda_map[x][y]
 
 #change indexing in matrix to be able to use lambda_map[x][y]
 	def reindex(self):
