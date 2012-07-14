@@ -6,7 +6,7 @@ import sys, os, signal, time
 from threading import Thread
 from threading import Event
 from displayer import MapDrawer
-from mapupdater import world
+from mapupdater import world, normallogger
 from controler import controler, kcontroler, botcontroler, SimulatorDieEvent
 
 
@@ -31,7 +31,7 @@ def reset_tty_and_exit():
 		
 limiter_thread=None
 
-def handler(signum, frame):
+def handlerdebug(signum, frame):
 	print 'Signal ', signum, 'catched'
 	if signum == signal.SIGINT:
 		print 'SIGINT, we exit !'
@@ -61,10 +61,27 @@ def handler(signum, frame):
 		print 'SIGTERM, we exit as well, did we miss SIGINT ??'
 		cont.set_movement("A")
 		reset_tty_and_exit()
-		
-signal.signal(signal.SIGINT, handler)
-signal.signal(signal.SIGTERM, handler)
 
+def handler(signum, frame):
+	if signum == signal.SIGINT:
+		
+		log = normallogger()
+		while 1:
+			nextmove = control.get_next()
+			world.set_movement(nextmove)
+			log.write(nextmove)
+			if nextmove == "A":
+				del log
+				exit(0)
+				
+			
+if debug :
+	signal.signal(signal.SIGINT, handlerdebug)
+	signal.signal(signal.SIGTERM, handlerdebug)
+else:
+	signal.signal(signal.SIGINT, handler)
+	signal.signal(signal.SIGTERM, handler)
+	
 #time.clock() returns cpu time for the whole process (under linux/unix)
 #wait on locks or IO are not included
 def limiter_simulator():
@@ -143,9 +160,10 @@ lambda_map=displayer.getmap()
 
 waterstuff=(water_value,flooding_value,waterproof_value)
 world = world(lambda_map, waterstuff)
-if sys.argv[1] == "kcontroler":
+
+if debug and sys.argv[1] == "kcontroler":
 	control = kcontroler(world)
-elif sys.argv[1] == "botcontroler":
+elif debug and sys.argv[1] == "botcontroler" or not debug:
 	control = botcontroler(world)
 	
 
@@ -187,3 +205,15 @@ if debug and sys.argv[1] == "botcontroler":
 			SimulatorDieEvent.stop_that.set()
 			raise
 	
+
+
+#no debug mode
+while 1:
+	try:
+		explore_state = control.explore_step()
+		update_state = control.update()
+		if not explore_state and not update_state:
+			break
+	except:
+		SimulatorDieEvent.stop_that.set()
+		raise

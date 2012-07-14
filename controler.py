@@ -156,6 +156,8 @@ class botcontroler(controler):
 		#~ print "*****************************************"
 		#~ print self.ASV[hash_the_world(self.world)]
 		world = self.world
+		if hash_the_world(world) not in self.ASV:
+			return "A"
 		action = self.ASV[hash_the_world(world)].maxhopeaction
 		if action == "W":
 			action = "A"

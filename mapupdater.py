@@ -174,21 +174,23 @@ class waterworld:
 		return res
 		
 
-
-class debuglogger():
-	f=open("output","w")	
-	loggedstr = ""
-	def __init__(self):
-		pass
+class logger:
 	
+	loggedstr = ""
+		
 	def write(self, text):
 		self.loggedstr = self.loggedstr+text
-		print self.loggedstr
-		
+		#print self.loggedstr
+	
+class debuglogger(logger):
+	f=open("output","w")	
+
 	def __del__(self):
 		#~ print "write_to_file"
 		self.f.write(self.loggedstr)
 		#~ self.f.close()
 		
-#~ class normallogger(logger):
-	#~ f=open(sys.stdout) 	
+class normallogger(logger):
+	
+	def __del__(self):
+		print self.loggedstr
