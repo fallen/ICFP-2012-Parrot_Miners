@@ -134,7 +134,7 @@ class world:
 		self.killed=True
 
 	def move(self, x,y, xp,yp):
-		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o' or self.lambda_map[xp][yp] == '!':
+		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == '!':
 			if self.lambda_map[xp][yp] == '\\': # Pick up lambda
 				self.lambdas.remove('\\')
 				self.last_points+=25
