@@ -96,9 +96,9 @@ class world:
 		# Recopy new world into old_one
 
 		# Swapping lines. Complexity n instead of n*m
-		for i in range(self.cols):
+		for i in self.cols:
 			self.lambda_map.pop()
-		for x in range(self.cols):
+		for x in self.cols:
 			self.lambda_map.append(new_map[x])
 		return ret
 
