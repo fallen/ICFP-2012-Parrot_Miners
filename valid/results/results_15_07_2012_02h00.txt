@@ -1,0 +1,47 @@
+Map flood1
+Route RLLLLLDDDRURRRRLA
+Score = 234
+---
+Map flood2
+Route RRRLUUURRA
+Score = 141
+---
+Map flood3
+Route LLLUUUDRUUUDRRRRDRURUULDULULDUWLLLDLURRURDRRRRA
+Score = 404
+---
+Map flood4
+Route URULULLLA
+Score = 92
+---
+Map flood5
+Route RRLLDRDRDRDA
+Score = 189
+---
+Map contest1
+Route LWWDLDRDRLULLDLA
+Score = 210<br>Mining complete
+---
+Map contest2
+Route RRRLUUURRA
+Score = 141
+---
+Map contest3
+Route LRRDDDLLA
+Score = 92
+---
+Map contest4
+Route RRLLDRDRDDRRRLA
+Score = 236
+---
+Map contest5
+Route LLLUUUDRUUUDRRRRDRURUULDULULDUWLLLDLURRURDRRRRA
+Score = 404
+---
+Map contest6
+Route RUURRRLLLLRRRRRRRRRRUUULLLULDDLULLDLLLUUUUA
+Score = 258
+---
+Map contest7
+Route RDRRRDRLDDRDULULLLDDLA
+Score = 379
