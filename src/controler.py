@@ -65,7 +65,7 @@ class explorerstate:
 		self.actionsresults = {}
 		self.actionspoints = {}
 		self.hope = 0
-		self.maxhopeaction = "W"
+		self.maxhopeaction = "A"
 		self.arrived_with_w = False
 		self.visited = False
 
@@ -110,8 +110,9 @@ class botcontroler(controler):
 	def __init__(self, world):
 		controler.__init__(self, world)
 		
-		self.actions = ["U", "R", "L", "D", "W"]
-		if world.hasBeard:
+		self.actions = ["U", "R", "L", "D"]
+		if world.wadlersbeard.hasBeards():
+
 			self.actions.append("S")
 		self.ASV = {}
 		self.ASV[hash_the_world(world)] = explorerstate(world)
