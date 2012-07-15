@@ -102,10 +102,6 @@ if debug:
 	limiter_thread=Thread(None,limiter_simulator,"Resources limiter").start()
 
 
-
-
-
-
 lambda_map = [[]]
 
 
@@ -118,9 +114,11 @@ with f as m:
 	water_value=0
 	flooding_value=0
 	waterproof_value=10
+	growth=25
+	razors=0
 	trampolines = {}
 	for line in m:
-		if "Waterproof" in line:
+		if "Waterproof" in line: #Waterproof needs to stay before water
 			words=line.split(" ")
 			waterproof_value=int(words[1])
 			continue
@@ -137,6 +135,14 @@ with f as m:
 			trampoline_name = words[1]
 			target_number = int(words[3])
 			trampolines[trampoline_name] = target_number
+			continue
+		elif "Razors" in line:
+			words= line.split(" ")
+			razors=int(words[1])
+			continue
+		elif "Growth" in line:
+			words = line.split(" ")
+			growth=int(words[1])
 			continue
 		if line.strip() == "":
 			continue
@@ -160,10 +166,12 @@ displayer.reindex()
 #Now lambda_map is "reindexed"
 lambda_map=displayer.getmap()
 
+beards=displayer.getbeards()
 
-
+beardstuff=(razors,growth,beards)
+print beardstuff
 waterstuff=(water_value,flooding_value,waterproof_value)
-world = world(lambda_map, waterstuff, trampolines)
+world = world(lambda_map, waterstuff, trampolines, beardstuff)
 
 if debug and sys.argv[1] == "kcontroler":
 	control = kcontroler(world)

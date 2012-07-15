@@ -2,12 +2,14 @@
 # -*- indent-tabs-mode: t -*-
 
 class MapDrawer:
+	
 	def __init__(self,lambda_map):
 		#Map from input uses first index for lines, we want it for columns
 		self.height=len(lambda_map)
 		self.width=len(lambda_map[0])
 		#Here, lambda_map is "raw" ie. indexing came from input
 		self.lambda_map=lambda_map
+		self.beards=[]
 
 #change indexing in matrix to be able to use lambda_map[x][y]
 	def reindex(self):
@@ -15,7 +17,14 @@ class MapDrawer:
 		for i in range(self.width):
 			for j in range(self.height):
 				lambda_indexed[i][j]=self.lambda_map[j][i]
+				 # Filling beards list coordinates.
+				if lambda_indexed[i][j] == "W" :
+					t=(i,j)
+					self.beards.append(t)
 		self.lambda_map=lambda_indexed
+
+	def getbeards(self):
+		return self.beards
 
 	def getmap(self):
 		return self.lambda_map

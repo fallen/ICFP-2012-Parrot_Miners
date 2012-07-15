@@ -4,7 +4,7 @@ import pdb
 
 class world:
 
-	def __init__(self, lambda_map, waterstuff, trampolines):
+	def __init__(self, lambda_map, waterstuff, trampolines, beardstuff):
 		self.lambda_map = lambda_map
 		self.lambdas = []
 		#~ self.logger = debuglogger()
@@ -18,6 +18,7 @@ class world:
 		self.trampolines = trampolines
 		self.possible_trampolines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 		self.trampoline_position = {}
+		self.wadlersbeard=wadlersbeard(beardstuff)
 
 		for x in range(len(self.lambda_map)):
 			for y in range(len(self.lambda_map[x])):
@@ -37,7 +38,7 @@ class world:
 				if self.lambda_map[x][y] == '\\':
 					self.lambdas.append((x,y))
 		self.lambdasmax = len(self.lambdas)
-	
+
 	def get_points(self):
 		return self.last_points
 		
@@ -46,6 +47,7 @@ class world:
 		#allocate
 		new_map = copy.deepcopy(self.lambda_map)
 		#set it to ''
+		self.wadlersbeard.startUpdate()
 		for y in range(len(new_map[0])):
 			for x in range(len(new_map)):
 				if self.lambda_map[x][y] == '*':
@@ -77,9 +79,16 @@ class world:
 				if self.lambda_map[x][y] == 'L' and len(self.lambdas) == 0:
 					ret = True
 					new_map[x][y] = 'O'
-						
+				# Growing beards if necessary
+				if self.lambda_map[x][y] == 'W':
+					self.wadlersbeard.tick(self.lambda_map,new_map)
+				# If robot wannashave, lets shavetheworld
+				if self.lambda_map[x][y] == 'R' and self.wadlersbeard.wannaShave():
+					self.wadlersbeard.shavetheworld(x,y,self.lambda_map,new_map)
+		# Recopy new world into old_one
+		# Could maybe swap lines instead of filling each case to reduce cpu times (n complexity instead of n*m) without modifying lambda_map nor newmap pointers ?
 		for x in range(len(new_map)):
-			for y in range(len(new_map[x])):			
+			for y in range(len(new_map[x])):
 				self.lambda_map[x][y] = new_map[x][y]
 		
 		return ret
@@ -99,32 +108,38 @@ class world:
 			print self.death_cause
 			print >> sys.stderr, 'Dead robot is dead :('
 		print self.waterworld
+		print self.wadlersbeard
 
 
 	def kill(self):
 		self.killed=True
 
 	def move(self, x,y, xp,yp):
-		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o':
-			if self.lambda_map[xp][yp] == '\\':
+		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o' or self.lambda_map[xp][yp]=='!':
+			if self.lambda_map[xp][yp] == '\\': # Pick up lambda
 				self.lambdas.remove((xp,yp))
 				self.last_points+=25
+			if self.lambda_map[xp][yp] == '!': # Pick up razor
+				self.wadlersbeard.pickupRazor()
 			self.lambda_map[xp][yp] = 'R'
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
 			return True
+		# Pushing rock to the right
 		elif xp == x+1 and self.lambda_map[xp][yp] == '*' and self.lambda_map[x+2][y] == ' ':
 			self.lambda_map[xp][yp] = 'R'
 			self.lambda_map[xp+1][yp] = '*'
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
 			return True
+		# Pushing rock to the left
 		elif xp == x-1 and self.lambda_map[xp][yp] == '*' and self.lambda_map[x-2][y] == ' ':
 			self.lambda_map[xp][yp] = 'R'
 			self.lambda_map[xp-1][yp] = '*'
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
 			return True
+		# Going into open lift
 		elif self.lambda_map[xp][yp] == 'O':
 			self.last_points += 50 * self.lambdasmax
 			self.won = True
@@ -132,6 +147,7 @@ class world:
 			self.robotpos = (xp,yp)
 			self.lambda_map[x][y] = ' '
 			return True
+		# TRAMPOLINE, TRAMPOLINE !!!
 		elif self.lambda_map[xp][yp] in self.trampolines:
 			(a,b) = self.trampolines[self.lambda_map[xp][yp]]
 			del self.trampolines[self.lambda_map[xp][yp]]
@@ -152,10 +168,11 @@ class world:
 					
 		else :
 			return False
-	
+
 	def set_movement(self, move):
 		self.last_points=-1
 		moved = False
+		self.shave=False # This is read if single_round to apply shave
 		if move == "U":
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]+1)
 		if move == "D":
@@ -164,6 +181,9 @@ class world:
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]-1, self.robotpos[1])
 		if move == "R":
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]+1, self.robotpos[1])
+		if move == "S":
+			self.wadlersbeard.setFlagShave()
+			moved = True
 		if move == "A":
 			self.last_points += 25 * (self.lambdasmax - len(self.lambdas))
 			moved = True
@@ -224,6 +244,82 @@ class waterworld:
 		return res
 		
 
+class wadlersbeard:
+	def __init__(self,(razors,growth,beards)):
+		self.razors=razors # Initial razors value
+		self.growth_rate=growth # Number of steps before beards expansion
+		self.beards=beards # list of 2-tuples of beards coordinates
+		self.counter=self.growth_rate-1
+		self.robotwannashave=False # Flag to check Shave action
+		self.startupdate=True # This flag is set to True before map update. We can then detect first call to tick and update counter only once per update (instead of once per beard !!)
+
+	def __str__(self):
+		res="Razors "+str(self.razors)+"\n"
+		res=res+"Growth counter "+str(self.counter)+"\n"
+		#res=res+"Beards coordinates "+str(self.beards)
+		return res
+
+	def startUpdate(self):
+		self.startupdate=True
+
+	def setFlagShave(self,value=True):
+		self.robotwannashave=value
+
+	def wannaShave(self):
+		return self.robotwannashave
+
+
+	# Add one razor
+	def pickupRazor(self):
+		self.razors+=1
+
+	def shaveIfPossible(self,lambda_map,newmap,x,y):
+		if lambda_map[x][y] == 'W' :
+			newmap[x][y] = ' '
+
+	# Use one razor and apply on map. This manages shave action
+	def shavetheworld(self,x,y,lambda_map,newmap):
+		if self.razors > 0 :
+			self.razors-=1
+			self.setFlagShave(False)
+			for i in [ x, x+1 , x-1] :
+				for j in [ y, y+1, y-1 ] :
+					#9 cases checked even if only 8 are useful
+					self.shaveIfPossible(lambda_map,newmap,i,j)
+		else:
+			raise Exception("Can't shave without razors ! Should've used more canShave() !")
+
+	# Have we enough razors to shave ?
+	def canShave(self):
+		return self.razors==0
+
+	def expandBeardIfPossible(self,lambda_map,newmap, x,y):
+		if lambda_map[x][y] == ' ':
+			newmap[x][y] = 'W'
+			return (x,y)
+		else:
+			return None
+
+	#This will modify world to set new beards if necessary. It manages environement beard growth
+	def tick(self,lambda_map,newmap):
+		if self.counter == 0:
+			self.counter=self.growth_rate-1
+			newbeards=[]
+			for (bx, by) in self.beards:
+				# for each beard, expand if possible. 9 cases checked even if only 8 are useful
+				print "Try expand beard "+str(bx)+" "+str(by)
+				for x in [ bx+1, bx, bx-1 ] :
+					for y in [ by ,by+1,by-1 ]:
+						res=self.expandBeardIfPossible(lambda_map,newmap,x,y)
+						if res != None :
+							newbeards.append(res)
+			self.beards.extend(newbeards)
+		else:
+			if self.startupdate:
+				self.counter-=1
+				self.startupdate=False
+
+
 class logger:
 	
 	loggedstr = ""
@@ -241,6 +337,5 @@ class debuglogger(logger):
 		#~ self.f.close()
 
 class normallogger(logger):
-	
 	def __del__(self):
 		print self.loggedstr

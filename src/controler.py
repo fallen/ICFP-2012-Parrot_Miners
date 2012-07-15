@@ -23,11 +23,11 @@ class SimulatorDieEvent:
 class controler:
 	def __init__(self, world):
 		self.world = world
-		
+
 class kcontroler(controler):
 	def __init__(self, world):
 		controler.__init__(self, world)
-	
+
 	def get_next(self):
 		fd = sys.stdin.fileno()
 		old_settings = termios.tcgetattr(fd)
@@ -40,7 +40,7 @@ class kcontroler(controler):
 			os.system("reset")
 			SimulatorDieEvent.stop_that.set()
 			sys.exit(0)
-		
+
 		if key == "z":
 			return "U"
 		if key == "s":
@@ -53,7 +53,8 @@ class kcontroler(controler):
 			return "A"
 		if key == "w":
 			return "W"
-			
+		if key == "e":
+			return "S"
 
 class explorerstate:
 	def __init__(self, world):
@@ -64,7 +65,6 @@ class explorerstate:
 		self.maxhopeaction = "W"
 		self.arrived_with_w = False
 		self.visited = False
-		
 	def explore(self, move, ASV=None):
 		cworld = copy.deepcopy(self.world)
 		moved = cworld.set_movement(move)
@@ -83,7 +83,7 @@ class explorerstate:
 				self.actionsresults[move] = None
 				self.actionspoints[move] = None
 		return moved
-	
+
 	def __str__(self):
 		print self.world
 		MapDrawer(self.world.lambda_map).draw()
@@ -100,7 +100,6 @@ class explorerstate:
 		if self.arrived_with_w:
 			print "origin : W"
 		return ""
-
 
 class botcontroler(controler):
 	
