@@ -87,12 +87,14 @@ def limiter_simulator():
 		#print >> sys.stderr,"time clock"+str(time.clock())
 		if time.clock() > 160:
 			print >> sys.stderr, "Sending SIGTERM"
-			handlerdebug(signal.SIGTERM,None)
+			os.kill(os.getpid(), signal.SIGTERM)
+#			handlerdebug(signal.SIGTERM,None)
 			print "Simulator died"
 			return
-		if time.clock()>150: #will return true if flag is set
+		if time.clock() > 150: #will return true if flag is set
 			print >> sys.stderr,  "Sending SIGINT"
-			handlerdebug(signal.SIGINT,None)
+			os.kill(os.getpid(), signal.SIGINT)
+#			handlerdebug(signal.SIGINT,None)
 			print "Simulator died"
 			return
 	return
