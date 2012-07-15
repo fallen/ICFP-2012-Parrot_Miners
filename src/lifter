@@ -111,7 +111,7 @@ if debug :
 	f = open(sys.argv[2])
 else:
 	f = sys.stdin
-	
+
 with f as m:
 	water_value=0
 	flooding_value=0
@@ -163,16 +163,19 @@ for i, val in enumerate(lambda_map):
 	if len(lambda_map[i]) != maxcol:
 		val.extend([' ' for padder in range(maxcol - len(val))])
 
-displayer=MapDrawer(lambda_map)
+displayer=MapDrawer(lambda_map,trampolines)
 displayer.reindex()
 #Now lambda_map is "reindexed"
+#get stuff out of displayer, try to minimise full traversal from happening
 lambda_map=displayer.getmap()
-
+lambdas=displayer.getlambda()
+robotpos=displayer.getrobotpos()
+trampstuff=displayer.gettrampostuff()
 beards=displayer.getbeards()
 
 beardstuff=(razors,growth,beards)
 waterstuff=(water_value,flooding_value,waterproof_value)
-world = world(lambda_map, waterstuff, trampolines, beardstuff)
+world = world(lambda_map, robotpos,lambdas,trampstuff,  waterstuff, beardstuff)
 
 if debug and sys.argv[1] == "kcontroler":
 	control = kcontroler(world)
