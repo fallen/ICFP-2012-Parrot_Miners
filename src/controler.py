@@ -139,15 +139,15 @@ class botcontroler(controler):
 			#print len(self.ASV)
 			#~ print "*****************************************"
 			return True
-		else:
-			return False
+		#~ else:
+			#~ return False
 			
 		#~ print "************* END ****************************"
 		#~ for value in self.ASV.values(): print value
 		#~ print len(self.ASV)
 		#~ print "*****************************************"
 		#pdb.set_trace()
-		return ret
+		return True
 		
 	def recurse_update(self, world):
 		value = self.ASV[hash_the_world(world)]
@@ -206,6 +206,8 @@ class botcontroler(controler):
 			self.updated = True
 			
 		world = self.world
+		if not world :
+			return "A"
 		if hash_the_world(world) not in self.ASV:
 			return "A"
 		action = self.ASV[hash_the_world(world)].maxhopeaction
