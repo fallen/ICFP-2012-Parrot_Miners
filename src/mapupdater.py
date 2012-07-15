@@ -94,11 +94,12 @@ class world:
 				if self.lambda_map[x][y] == 'R' and self.wadlersbeard.wannaShave():
 					self.wadlersbeard.shavetheworld(x,y,self.lambda_map,new_map)
 		# Recopy new world into old_one
-		# Could maybe swap lines instead of filling each case to reduce cpu times (n complexity instead of n*m) without modifying lambda_map nor newmap pointers ?
-		for x in self.cols:
-			for y in self.rows:
-				self.lambda_map[x][y] = new_map[x][y]
 
+		# Swapping lines. Complexity n instead of n*m
+		for i in range(self.cols):
+			self.lambda_map.pop()
+		for x in range(self.cols):
+			self.lambda_map.append(new_map[x])
 		return ret
 
 
