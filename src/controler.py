@@ -143,8 +143,8 @@ class botcontroler(controler):
 			#print len(self.ASV)
 			#~ print "*****************************************"
 			return True
-		#~ else:
-			#~ return False
+		else:
+			return False
 			
 		#~ print "************* END ****************************"
 		#~ for value in self.ASV.values(): print value
