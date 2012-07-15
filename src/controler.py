@@ -10,7 +10,10 @@ import hashlib
 
 			
 def hash_the_world(world):
-	return hashlib.sha1(world.lambda_map.__str__()).digest()
+	hasher = hashlib.sha1()
+	hasher.update(world.lambda_map.__str__())
+	hasher.update(world.waterworld.water.__str__())
+	return hasher.digest()
 	
 class SimulatorDieEvent:
 	stop_that=Event()
