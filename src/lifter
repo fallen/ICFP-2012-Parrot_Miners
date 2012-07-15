@@ -46,7 +46,7 @@ def handlerdebug(signum, frame):
 				time.sleep(1)
 				world.print_status()
 				if nextmove == "A":
-					print "abort"
+					print "abort ", score
 					reset_tty_and_exit()
 				if world.killed:
 					print "lost"
@@ -64,16 +64,14 @@ def handlerdebug(signum, frame):
 
 def handler(signum, frame):
 	if signum == signal.SIGINT:
-		
 		log = normallogger()
 		while 1:
 			nextmove = control.get_next()
 			world.set_movement(nextmove)
 			log.write(nextmove)
-			if nextmove == "A":
+			if nextmove == "A" or world.killed or world.won:
 				del log
 				exit(0)
-				
 			
 if debug :
 	signal.signal(signal.SIGINT, handlerdebug)
@@ -89,12 +87,12 @@ def limiter_simulator():
 		#print >> sys.stderr,"time clock"+str(time.clock())
 		if time.clock() > 160:
 			print >> sys.stderr, "Sending SIGTERM"
-			handler(signal.SIGTERM,None)
+			handlerdebug(signal.SIGTERM,None)
 			print "Simulator died"
 			return
 		if time.clock()>150: #will return true if flag is set
 			print >> sys.stderr,  "Sending SIGINT"
-			handler(signal.SIGINT,None)
+			handlerdebug(signal.SIGINT,None)
 			print "Simulator died"
 			return
 	return
@@ -204,9 +202,11 @@ if debug and sys.argv[1] == "botcontroler":
 	while 1:
 		try:
 			explore_state = control.explore_step()
-			update_state = control.update()
-			if not explore_state and not update_state:
-				break
+			#~ update_state = control.update()
+			if not explore_state:
+				handlerdebug(signal.SIGINT,None)
+				SimulatorDieEvent.stop_that.set()
+				exit(0)
 		except:
 			SimulatorDieEvent.stop_that.set()
 			raise
@@ -217,8 +217,9 @@ if debug and sys.argv[1] == "botcontroler":
 while 1:
 	try:
 		explore_state = control.explore_step()
-		update_state = control.update()
-		if not explore_state and not update_state:
+		#~ update_state = control.update()
+		if not explore_state:
+			handler(signal.SIGINT,None)
 			break
 	except:
 		SimulatorDieEvent.stop_that.set()
