@@ -23,7 +23,8 @@ class world:
 			self.lambdas=lambdas
 			self.possible_trampolines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 			self.wadlersbeard=wadlersbeard(beardstuff)
-
+			self.cols = range(len(self.lambda_map))
+			self.rows = range(len(self.lambda_map[0]))
 
 			self.lambdasmax = len(self.lambdas)
 
@@ -39,8 +40,8 @@ class world:
 		new_map = copy.deepcopy(self.lambda_map)
 		#set it to ''
 		self.wadlersbeard.startUpdate()
-		for y in range(len(new_map[0])):
-			for x in range(len(new_map)):
+		for y in self.rows:
+			for x in self.cols:
 				if self.lambda_map[x][y] == '@':
 					horock = True
 				else:
@@ -94,10 +95,10 @@ class world:
 					self.wadlersbeard.shavetheworld(x,y,self.lambda_map,new_map)
 		# Recopy new world into old_one
 		# Could maybe swap lines instead of filling each case to reduce cpu times (n complexity instead of n*m) without modifying lambda_map nor newmap pointers ?
-		for x in range(len(new_map)):
-			for y in range(len(new_map[x])):
+		for x in self.cols:
+			for y in self.rows:
 				self.lambda_map[x][y] = new_map[x][y]
-		
+
 		return ret
 
 
@@ -225,6 +226,8 @@ class world:
 
 		def __deepcopy__(self, memo):
 			newworld = world(copy.deepcopy(self.lambda_map, memo))
+			newworld.cols = self.cols
+			newworld.rows = self.rows
 			newworld.waterworld = copy.deepcopy(self.waterworld, memo)
 			newworld.wadlersbeard = copy.deepcopy(self.wadlersbeard, memo)
 			newworld.trampolines = copy.deepcopy(self.trampolines, memo)
