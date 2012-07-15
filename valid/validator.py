@@ -1,7 +1,8 @@
 #!/usr/bin/python
 #import commands
 import subprocess
-
+import re
+import string
 #Invoke from repo root : ./valid/validator.py
 
 def check_output(command):
@@ -17,6 +18,13 @@ def test_map(mapname, route):
 	route=route.strip()
 	sed_stuff="sed -e \"s!.*Score: \(.*\)<br>.*!\\1!g\""
 	cmd="curl -s http://undecidable.org.uk/~edwin/cgi-bin/weblifter.cgi --data 'mapfile="+mapname+"&route="+route+"' | grep -i score |"+sed_stuff
+	cmd="curl -s http://undecidable.org.uk/~edwin/cgi-bin/weblifter.cgi --data 'mapfile="+mapname+"&route="+route+"'"
+	returned_output=check_output(cmd)
+	out=returned_output[0]
+	r = re.compile(".*<pre>(.*)</pre>.*",re.DOTALL|re.MULTILINE)
+	l = re.search(r,out)
+	final_map= l.group(1)
+	cmd="curl -s http://undecidable.org.uk/~edwin/cgi-bin/weblifter.cgi --data 'mapfile="+mapname+"&route="+route+"' | grep -i score |"+sed_stuff
 	returned_output=check_output(cmd)
 	out=returned_output[0]
 	broken=False
@@ -28,9 +36,16 @@ def test_map(mapname, route):
 	else:
 		score=out.strip()
 	print "---"
+	print ""
 	print "Map "+mapname
+	print ""
+	print final_map
 	print "Route "+route
-	print "Score = "+score
+	if "complete" in score:
+		print "Mining complete : got all lambdas \o/" #You rock
+	score2=string.replace(score,"<br>"," ") # Remove nasty <br> on completion, do nothing otherwise
+	print "Score = "+score2
+
 	if broken:
 		print "Robot broken"
 
