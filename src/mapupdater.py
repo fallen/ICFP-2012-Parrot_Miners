@@ -200,6 +200,8 @@ class world:
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]-1, self.robotpos[1])
 		if move == "R":
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]+1, self.robotpos[1])
+		if not moved and move in ["U", "D", "L", "R"]:
+			return False
 		if move == "S":
 			self.wadlersbeard.setFlagShave()
 			moved = True
@@ -217,7 +219,7 @@ class world:
 			return True
 		#~ if move == "W" and updated:
 			#~ pdb.set_trace()
-		if move=="W" and updated:
+		if move=="W" and self.lambda_map[self.robotpos[0]+1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]-1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]+1] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]-1] not in ["."," "]:
 			moved = True
 		return moved
 			
