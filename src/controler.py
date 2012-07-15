@@ -138,7 +138,6 @@ class botcontroler(controler):
 			#~ print "*****************************************"
 			return True
 		else:
-			print "retfalse"
 			return False
 
 		
