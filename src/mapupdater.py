@@ -125,8 +125,6 @@ class world:
 			self.lambda_map[x][y] = ' '
 			return True
 		elif self.lambda_map[xp][yp] in self.trampolines:
-			print self.lambda_map[xp][yp]
-			print self.trampolines[self.lambda_map[xp][yp]]
 			(a,b) = self.trampolines[self.lambda_map[xp][yp]]
 			del self.trampolines[self.lambda_map[xp][yp]]
 			self.robotpos = (a,b)
