@@ -69,6 +69,7 @@ class explorerstate:
 				self.actionsresults[move] = cworld
 				self.actionspoints[move] = cworld.get_points()
 			else:
+				#~ pdb.set_trace()
 				self.actionsresults[move] = ASV[hash_the_world(cworld)].world
 				self.actionspoints[move] = cworld.get_points()
 				return False
@@ -86,6 +87,7 @@ class explorerstate:
 				#~ MapDrawer(value.lambda_map).draw()
 		
 		print "hope : ", self.hope
+		print "maxkey : ", self.maxhopeaction
 		print "scoring :", self.actionspoints
 		print "worlds :", self.actionsresults
 		print "visited :", self.visited
@@ -100,10 +102,12 @@ class botcontroler(controler):
 		self.actions = ["U", "R", "L", "D","W"]
 		self.ASV = {}
 		self.ASV[hash_the_world(world)] = explorerstate(world)
+		self.updated = False
 		for action in self.actions:
 			if self.ASV[hash_the_world(world)].explore(action, self.ASV):
 				self.ASV[hash_the_world(self.ASV[hash_the_world(world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(world)].actionsresults[action])
-		self.update()
+				
+		#~ self.update()
 	
 			
 	def explore_step(self):
@@ -119,8 +123,9 @@ class botcontroler(controler):
 				
 		if updatable_world:
 			for action in self.actions:
-				if self.ASV[hash_the_world(updatable_world)].explore(action, self.ASV):
-					self.ASV[hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(updatable_world)].actionsresults[action])
+				if self.ASV[hash_the_world(updatable_world)].explore(action, self.ASV) :
+					if hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action]) not in self.ASV:
+						self.ASV[hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(updatable_world)].actionsresults[action])
 			#~ print "************* END ****************************"
 			#~ for value in self.ASV.values(): print value
 			#print len(self.ASV)
@@ -129,13 +134,7 @@ class botcontroler(controler):
 		else:
 			print "retfalse"
 			return False
-			
-		#~ print "************* END ****************************"
-		#~ for value in self.ASV.values(): print value
-		#~ print len(self.ASV)
-		#~ print "*****************************************"
-		#pdb.set_trace()
-		return ret
+
 		
 	def recurse_update(self, world):
 		value = self.ASV[hash_the_world(world)]
@@ -186,7 +185,7 @@ class botcontroler(controler):
 		#~ print "*****************************************"
 		#~ print self.ASV[hash_the_world(self.world)]
 		#~ pdb.set_trace()
-		return True
+		return False
 		
 	def get_next(self):
 		#for value in self.ASV.values(): print value
@@ -194,6 +193,18 @@ class botcontroler(controler):
 		#~ print "*****************************************"
 		#~ print self.ASV[hash_the_world(self.world)]
 		#~ pdb.set_trace()
+		if not self.updated:
+			self.update()			
+			self.updated = True
+			
+			f = open("saved_map","w")
+			stdout = sys.stdout
+			sys.stdout = f
+			print self.ASV[hash_the_world(self.world)]
+			print "**********************"
+			for value in self.ASV.values(): print value
+			sys.stdout = stdout
+			
 		world = self.world
 		if hash_the_world(world) not in self.ASV:
 			return "A"

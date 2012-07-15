@@ -92,7 +92,6 @@ class world:
 		self.killed=True
 
 	def move(self, x,y, xp,yp):
-		self.last_points -= 1
 		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o':
 			if self.lambda_map[xp][yp] == '\\':
 				self.lambdas.remove((xp,yp))
@@ -123,7 +122,7 @@ class world:
 			return False
 	
 	def set_movement(self, move):
-		self.last_points=0
+		self.last_points=-1
 		moved = False
 		if move == "U":
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]+1)
@@ -134,7 +133,7 @@ class world:
 		if move == "R":
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]+1, self.robotpos[1])
 		if move == "A":
-			self.last_points += 25 * (self.lambdasmax - len(self.lambdas)+1)
+			self.last_points += 25 * (self.lambdasmax - len(self.lambdas))
 			moved = True
 		if move == "W":
 			moved = False
@@ -144,8 +143,9 @@ class world:
 		if self.waterworld != None:
 			self.waterworld.tick(self.robotpos[1])
 		if (self.killed):
-			self.last_points = -1500
 			return True
+		#~ if move == "W" and updated:
+			#~ pdb.set_trace()
 		return moved or updated
 			
 
