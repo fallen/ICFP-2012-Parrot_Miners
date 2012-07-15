@@ -146,7 +146,9 @@ class world:
 			return True
 		#~ if move == "W" and updated:
 			#~ pdb.set_trace()
-		return moved or updated
+		if move=="W" and updated:
+			moved = True
+		return moved
 			
 
 

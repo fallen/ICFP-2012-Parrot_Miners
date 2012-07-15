@@ -57,8 +57,9 @@ class explorerstate:
 		self.world = world
 		self.actionsresults = {}
 		self.actionspoints = {}
-		self.hope = 0
+		self.hope = -1500
 		self.maxhopeaction = "W"
+		self.arrived_with_w = False
 		self.visited = False
 		
 	def explore(self, move, ASV=None):
@@ -69,13 +70,13 @@ class explorerstate:
 				self.actionsresults[move] = cworld
 				self.actionspoints[move] = cworld.get_points()
 			else:
-				#~ pdb.set_trace()
-				self.actionsresults[move] = ASV[hash_the_world(cworld)].world
-				self.actionspoints[move] = cworld.get_points()
-				return False
+				if move not in self.actionsresults or self.actionsresults[move] == None:
+					self.actionsresults[move] = ASV[hash_the_world(cworld)].world
+					self.actionspoints[move] = cworld.get_points()
 		else:
-			self.actionsresults[move] = None
-			self.actionspoints[move] = None
+			if move not in self.actionsresults:
+				self.actionsresults[move] = None
+				self.actionspoints[move] = None
 		return moved
 	
 	def __str__(self):
@@ -91,7 +92,8 @@ class explorerstate:
 		print "scoring :", self.actionspoints
 		print "worlds :", self.actionsresults
 		print "visited :", self.visited
-		
+		if self.arrived_with_w:
+			print "origin : W"
 		return ""
 
 
@@ -118,6 +120,8 @@ class botcontroler(controler):
 		
 		for value in self.ASV.keys():
 			if len(self.ASV[value].actionsresults) == 0:
+				#~ if self.ASV[value].arrived_with_w:
+					#~ pdb.set_trace()
 				updatable_world = self.ASV[value].world
 				break
 				
@@ -126,6 +130,8 @@ class botcontroler(controler):
 				if self.ASV[hash_the_world(updatable_world)].explore(action, self.ASV) :
 					if hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action]) not in self.ASV:
 						self.ASV[hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(updatable_world)].actionsresults[action])
+						if action == "W":
+							self.ASV[hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action])].arrived_with_w = True
 			#~ print "************* END ****************************"
 			#~ for value in self.ASV.values(): print value
 			#print len(self.ASV)
