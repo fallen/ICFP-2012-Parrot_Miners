@@ -225,9 +225,12 @@ while 1:
 	try:
 		explore_state = control.explore_step()
 		#~ update_state = control.update()
-		if not explore_state:
-			handler(signal.SIGINT,None)
-			break
+		
+		#TO BE UNCOMMENTED WHEN WORKING VALIDATOR
+		#~ if not explore_state:
+			#~ handler(signal.SIGINT,None)
+			#~ break
+		#END
 	except:
 		SimulatorDieEvent.stop_that.set()
 		raise

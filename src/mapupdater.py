@@ -4,40 +4,43 @@ import pdb
 
 class world:
 
-	def __init__(self, lambda_map, waterstuff, trampolines, beardstuff):
-		self.lambda_map = lambda_map
-		self.lambdas = []
-		#~ self.logger = debuglogger()
-		self.won= False
-		self.last_points=0
-		self.waterworld=None
-		self.killed=False
-		self.warning=""
-		self.death_cause=None
-		self.waterworld=waterworld(self,waterstuff)
-		self.trampolines = trampolines
-		self.possible_trampolines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
-		self.trampoline_position = {}
-		self.wadlersbeard=wadlersbeard(beardstuff)
+	def __init__(self, lambda_map, waterstuff=None, trampolines=None, beardstuff=None):
+		if (waterstuff == None):
+			self.lambda_map = lambda_map
+		else:
+			self.lambda_map = lambda_map
+			self.lambdas = []
+			#~ self.logger = debuglogger()
+			self.won= False
+			self.last_points=0
+			self.waterworld=None
+			self.killed=False
+			self.warning=""
+			self.death_cause=None
+			self.waterworld=waterworld(self,waterstuff)
+			self.trampolines = trampolines
+			self.possible_trampolines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+			self.trampoline_position = {}
+			self.wadlersbeard=wadlersbeard(beardstuff)
 
-		for x in range(len(self.lambda_map)):
-			for y in range(len(self.lambda_map[x])):
-				# if this is a trampoline target
-				if self.lambda_map[x][y].isdigit() and int(self.lambda_map[x][y]) > 0:
-					# we search wich trampoline it is the target of
-					for trampoline, target in self.trampolines.iteritems():
-						if target == int(self.lambda_map[x][y]):
-							# We replace target number by the target coordinates
-							# Target number is no longer needed
-							self.trampolines[trampoline] = (x, y)
-				if self.lambda_map[x][y] in self.possible_trampolines:
-					self.trampoline_position[self.lambda_map[x][y]] = (x,y)
-					
-				if self.lambda_map[x][y] == 'R':
-					self.robotpos = (x,y)
-				if self.lambda_map[x][y] == '\\' or self.lambda_map[x][y] == '@':
-					self.lambdas.append('\\')
-		self.lambdasmax = len(self.lambdas)
+			for x in range(len(self.lambda_map)):
+				for y in range(len(self.lambda_map[x])):
+					# if this is a trampoline target
+					if self.lambda_map[x][y].isdigit() and int(self.lambda_map[x][y]) > 0:
+						# we search wich trampoline it is the target of
+						for trampoline, target in self.trampolines.iteritems():
+							if target == int(self.lambda_map[x][y]):
+								# We replace target number by the target coordinates
+								# Target number is no longer needed
+								self.trampolines[trampoline] = (x, y)
+					if self.lambda_map[x][y] in self.possible_trampolines:
+						self.trampoline_position[self.lambda_map[x][y]] = (x,y)
+						
+					if self.lambda_map[x][y] == 'R':
+						self.robotpos = (x,y)
+					if self.lambda_map[x][y] == '\\' or self.lambda_map[x][y] == '@':
+						self.lambdas.append('\\')
+			self.lambdasmax = len(self.lambdas)
 
 	def get_points(self):
 		return self.last_points
@@ -134,6 +137,8 @@ class world:
 		self.killed=True
 
 	def move(self, x,y, xp,yp):
+		if xp > len(self.lambda_map)-1 or xp < 0 or yp < 0 or yp > len(self.lambda_map[0])-1:
+			pdb.set_trace()
 		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == '!':
 			if self.lambda_map[xp][yp] == '\\': # Pick up lambda
 				self.lambdas.remove('\\')
@@ -193,15 +198,25 @@ class world:
 		moved = False
 		self.shave=False # This is read if single_round to apply shave
 		if move == "U":
+			if self.robotpos[1] + 1 > len(self.lambda_map)-1:
+				return False
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]+1)
 		if move == "D":
+			if self.robotpos[1] - 1 < 0:
+				return False
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]-1)
 		if move == "L":
+			if self.robotpos[0] - 1 < 0:
+				return False
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]-1, self.robotpos[1])
 		if move == "R":
+			if self.robotpos[0] + 1 > len(self.lambda_map)-1:
+				return False
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]+1, self.robotpos[1])
+		
 		if not moved and move in ["U", "D", "L", "R"]:
 			return False
+			
 		if move == "S":
 			self.wadlersbeard.setFlagShave()
 			moved = True
@@ -219,9 +234,21 @@ class world:
 			return True
 		#~ if move == "W" and updated:
 			#~ pdb.set_trace()
-		if move=="W" and self.lambda_map[self.robotpos[0]+1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]-1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]+1] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]-1] not in ["."," "]:
+		if move=="W" and self.robotpos[0]+1 < len(self.lambda_map) and self.robotpos[0]-1 > 0 and self.robotpos[1]-1 > 0 and self.robotpos[1]+1 < len(self.lambda_map[0]) and self.lambda_map[self.robotpos[0]+1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]-1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]+1] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]-1] not in ["."," "]:
 			moved = True
 		return moved
+
+		def __deepcopy__(self, memo):
+			newworld = world(copy.deepcopy(self.lambda_map, memo))
+			newworld.waterworld = copy.deepcopy(self.waterworld, memo)
+			newworld.wadlersbeard = copy.deepcopy(self.wadlersbeard, memo)
+			newworld.trampolines = copy.deepcopy(self.trampolines, memo)
+			newworld.trampoline_position = copy.deepcopy(self.trampoline_position, memo)
+			newworld.robotpos = self.robotpos
+			newworld.lambdasmax = self.lambdasmax
+			newworld.lambdas = copy.deepcopy(self.lambdas, memo)
+			newworld.killed = self.killed
+			return newworld
 			
 
 
