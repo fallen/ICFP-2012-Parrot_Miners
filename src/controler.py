@@ -60,7 +60,7 @@ class explorerstate:
 		self.world = world
 		self.actionsresults = {}
 		self.actionspoints = {}
-		self.hope = -1500
+		self.hope = 0
 		self.maxhopeaction = "W"
 		self.arrived_with_w = False
 		self.visited = False
@@ -76,6 +76,8 @@ class explorerstate:
 				if move not in self.actionsresults or self.actionsresults[move] == None:
 					self.actionsresults[move] = ASV[hash_the_world(cworld)].world
 					self.actionspoints[move] = cworld.get_points()
+				else:
+					return False
 		else:
 			if move not in self.actionsresults:
 				self.actionsresults[move] = None
@@ -118,7 +120,6 @@ class botcontroler(controler):
 	def explore_step(self):
 		ret = False
 		world = self.world
-		random.seed = time.clock()
 		updatable_world = None
 		
 		for value in self.ASV.keys():
@@ -167,8 +168,8 @@ class botcontroler(controler):
 				if value.actionsresults[move] != None:
 					hopemove = value.actionspoints[move] + self.ASV[hash_the_world(value.actionsresults[move])].hope
 					if hopemove > hopemax:
-							hopemax = hopemove
-							value.maxhopeaction = move
+						hopemax = hopemove
+						value.maxhopeaction = move
 			value.hope = hopemax
 		
 				
