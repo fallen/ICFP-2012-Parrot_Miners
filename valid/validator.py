@@ -3,6 +3,7 @@
 import subprocess
 import re
 import string
+import sys
 #Invoke from repo root : ./valid/validator.py
 
 def check_output(command):
@@ -49,8 +50,15 @@ def test_map(mapname, route):
 	if broken:
 		print "Robot broken"
 
-maps=["flood"+str(i) for i in range(1,6)]
-maps.extend([ "contest"+str(j) for j in range(1,11)])
+if len(sys.argv) == 2:
+	print "Running single map "+sys.argv[1]
+	output=check_output("./valid/runmap.sh "+sys.argv[1])
+	test_map(sys.argv[1],output[0])
+	exit(0)
+
+
+maps=[ "contest"+str(j) for j in range(1,11)]
+maps.extend(["flood"+str(i) for i in range(1,6)])
 maps.extend([ "trampoline"+str(k) for k in range(1,4)])
 maps.extend([ "horock"+str(k) for k in range(1,3)])
 for m in maps:
