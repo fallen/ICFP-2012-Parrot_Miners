@@ -52,6 +52,7 @@ def test_map(mapname, route):
 maps=["flood"+str(i) for i in range(1,6)]
 maps.extend([ "contest"+str(j) for j in range(1,11)])
 maps.extend([ "trampoline"+str(k) for k in range(1,4)])
+maps.extend([ "horock"+str(k) for k in range(1,3)])
 for m in maps:
 	output=check_output("./valid/runmap.sh "+m)
 	test_map(m,output[0])

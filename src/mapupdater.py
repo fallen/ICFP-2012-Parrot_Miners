@@ -33,39 +33,58 @@ class world:
 					
 				if self.lambda_map[x][y] == 'R':
 					self.robotpos = (x,y)
-				if self.lambda_map[x][y] == '\\':
-					self.lambdas.append((x,y))
+				if self.lambda_map[x][y] == '\\' or self.lambda_map[x][y] == '@':
+					self.lambdas.append('\\')
 		self.lambdasmax = len(self.lambdas)
 	
 	def get_points(self):
 		return self.last_points
-		
+
+	def is_rock(self, char):
+		return (char == '*') or (char == '@')
+
 	def single_round(self):
 		#allocate
 		new_map = copy.deepcopy(self.lambda_map)
 		#set it to ''
 		for y in range(len(new_map[0])):
 			for x in range(len(new_map)):
-				if self.lambda_map[x][y] == '*':
-                    #Rock falling straigth
+				if self.lambda_map[x][y] == '@':
+					horock = True
+				else:
+					horock = False
+				if self.is_rock(self.lambda_map[x][y]):
+					#Rock falling straigth
 					if self.lambda_map[x][y-1] == ' ':
 						new_map[x][y] = ' '
-						new_map[x][y-1] = '*'
+						if horock and self.lambda_map[x][y-2] != ' ':
+							new_map[x][y-1] = '\\'
+						else:
+							new_map[x][y-1] = self.lambda_map[x][y]
 						self.am_i_dead((x,y-1))
 					#Rock rolling over rock to the right
-					if self.lambda_map[x][y-1] == '*' and self.lambda_map[x+1][y] == ' ' and self.lambda_map[x+1][y-1] == ' ':
+					if self.is_rock(self.lambda_map[x][y-1]) and self.lambda_map[x+1][y] == ' ' and self.lambda_map[x+1][y-1] == ' ':
 						new_map[x][y] = ' '
-						new_map[x+1][y-1] = '*'
+						if horock and self.lambda_map[x+1][y-2] != ' ':
+							new_map[x+1][y-1] = '\\'
+						else:
+							new_map[x+1][y-1] = self.lambda_map[x][y]
 						self.am_i_dead((x+1,y-1))
 					#Rock rolling over rock to the left
-					if self.lambda_map[x][y-1] == '*' and (self.lambda_map[x+1][y] != ' ' or self.lambda_map[x+1][y-1] != ' ') and self.lambda_map[x-1][y] == ' ' and self.lambda_map[x-1][y-1] == ' ':
+					if self.is_rock(self.lambda_map[x][y-1]) and (self.lambda_map[x+1][y] != ' ' or self.lambda_map[x+1][y-1] != ' ') and self.lambda_map[x-1][y] == ' ' and self.lambda_map[x-1][y-1] == ' ':
 						new_map[x][y] = ' '
-						new_map[x-1][y-1] = '*'
+						if horock and self.lambda_map[x-1][y-2] != ' ':
+							new_map[x-1][y-1] = '\\'
+						else:
+							new_map[x-1][y-1] = self.lambda_map[x][y]
 						self.am_i_dead((x-1,y-1))
 					#Rock rolling over lambda to the right
 					if self.lambda_map[x][y-1] == '\\' and self.lambda_map[x+1][y] == ' ' and self.lambda_map[x+1][y-1] == ' ':
 						new_map[x][y] = ' '
-						new_map[x+1][y-1] = '*'
+						if horock and self.lambda_map[x+1][y-2] != ' ':
+							new_map[x+1][y-1] = '\\'
+						else:
+							new_map[x+1][y-1] = self.lambda_map[x][y]
 						self.am_i_dead((x+1,y-1))
 				# No lambdas left, opening lift
 				if self.lambda_map[x][y] == 'L' and len(self.lambdas) == 0:
@@ -99,21 +118,21 @@ class world:
 		self.last_points -= 1
 		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o':
 			if self.lambda_map[xp][yp] == '\\':
-				self.lambdas.remove((xp,yp))
+				self.lambdas.remove('\\')
 				self.last_points+=25
 			self.lambda_map[xp][yp] = 'R'
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
 			return True
-		elif xp == x+1 and self.lambda_map[xp][yp] == '*' and self.lambda_map[x+2][y] == ' ':
+		elif xp == x+1 and self.is_rock(self.lambda_map[xp][yp]) and self.lambda_map[x+2][y] == ' ':
+			self.lambda_map[xp+1][yp] = self.lambda_map[xp][yp]
 			self.lambda_map[xp][yp] = 'R'
-			self.lambda_map[xp+1][yp] = '*'
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
 			return True
-		elif xp == x-1 and self.lambda_map[xp][yp] == '*' and self.lambda_map[x-2][y] == ' ':
+		elif xp == x-1 and self.is_rock(self.lambda_map[xp][yp]) and self.lambda_map[x-2][y] == ' ':
+			self.lambda_map[xp-1][yp] = self.lambda_map[xp][yp]
 			self.lambda_map[xp][yp] = 'R'
-			self.lambda_map[xp-1][yp] = '*'
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
 			return True
