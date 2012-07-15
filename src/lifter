@@ -64,16 +64,14 @@ def handlerdebug(signum, frame):
 
 def handler(signum, frame):
 	if signum == signal.SIGINT:
-		
 		log = normallogger()
 		while 1:
 			nextmove = control.get_next()
 			world.set_movement(nextmove)
 			log.write(nextmove)
-			if nextmove == "A":
+			if nextmove == "A" or world.killed or world.won:
 				del log
 				exit(0)
-				
 			
 if debug :
 	signal.signal(signal.SIGINT, handlerdebug)
