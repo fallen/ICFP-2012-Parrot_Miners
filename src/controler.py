@@ -88,7 +88,7 @@ class explorerstate:
 
 	def __str__(self):
 		print self.world
-		MapDrawer(self.world.lambda_map).draw()
+		MapDrawer(self.world.lambda_map,{}).draw()
 		#~ for key, value in self.actionsresults.iteritems():
 			#~ print key, " : "
 			#~ if value != None:

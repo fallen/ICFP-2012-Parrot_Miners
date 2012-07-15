@@ -4,12 +4,11 @@ import pdb
 
 class world:
 
-	def __init__(self, lambda_map, waterstuff=None, trampolines=None, beardstuff=None):
+	def __init__(self, lambda_map,robotpos,lambdas, trampstuff, waterstuff=None, beardstuff=None):
 		if (waterstuff == None):
 			self.lambda_map = lambda_map
 		else:
 			self.lambda_map = lambda_map
-			self.lambdas = []
 			#~ self.logger = debuglogger()
 			self.won= False
 			self.last_points=0
@@ -18,28 +17,14 @@ class world:
 			self.warning=""
 			self.death_cause=None
 			self.waterworld=waterworld(self,waterstuff)
-			self.trampolines = trampolines
+			self.trampolines=trampstuff[0]
+			self.trampolines_positions=trampstuff[1]
+			self.robotpos=robotpos
+			self.lambdas=lambdas
 			self.possible_trampolines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
-			self.trampoline_position = {}
 			self.wadlersbeard=wadlersbeard(beardstuff)
 
-			for x in range(len(self.lambda_map)):
-				for y in range(len(self.lambda_map[x])):
-					# if this is a trampoline target
-					if self.lambda_map[x][y].isdigit() and int(self.lambda_map[x][y]) > 0:
-						# we search wich trampoline it is the target of
-						for trampoline, target in self.trampolines.iteritems():
-							if target == int(self.lambda_map[x][y]):
-								# We replace target number by the target coordinates
-								# Target number is no longer needed
-								self.trampolines[trampoline] = (x, y)
-					if self.lambda_map[x][y] in self.possible_trampolines:
-						self.trampoline_position[self.lambda_map[x][y]] = (x,y)
-						
-					if self.lambda_map[x][y] == 'R':
-						self.robotpos = (x,y)
-					if self.lambda_map[x][y] == '\\' or self.lambda_map[x][y] == '@':
-						self.lambdas.append('\\')
+
 			self.lambdasmax = len(self.lambdas)
 
 	def get_points(self):

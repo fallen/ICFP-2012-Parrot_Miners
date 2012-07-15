@@ -3,13 +3,26 @@
 
 class MapDrawer:
 	
-	def __init__(self,lambda_map):
+	def __init__(self,lambda_map,trampolines):
 		#Map from input uses first index for lines, we want it for columns
 		self.height=len(lambda_map)
 		self.width=len(lambda_map[0])
 		#Here, lambda_map is "raw" ie. indexing came from input
 		self.lambda_map=lambda_map
 		self.beards=[]
+		self.possible_trampolines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+		self.trampolines=trampolines
+		self.trampoline_position = {}
+		self.lambdas=[]
+
+	def gettrampostuff(self):
+		return (self.trampolines , self.trampoline_position)
+	
+	def getrobotpos(self):
+		return self.robotpos
+	
+	def getlambda(self):
+		return self.lambdas
 
 #change indexing in matrix to be able to use lambda_map[x][y]
 	def reindex(self):
@@ -21,6 +34,16 @@ class MapDrawer:
 				if lambda_indexed[i][j] == "W" :
 					t=(i,j)
 					self.beards.append(t)
+				if lambda_indexed[i][j].isdigit():
+					for trampoline, target in self.trampolines.interitems():
+						if target == int(lambda_indexed[i][j]):
+							self.trampolines[trampoline] = (i, j)
+				if lambda_indexed[i][j] in self.possible_trampolines:
+					self.trampoline_position[lambda_indexed[i][j]] = (i,j)
+				if lambda_indexed[i][j] == 'R':
+					self.robotpos = (i,j)
+				if lambda_indexed[i][j] == '\\' or lambda_indexed[i][j] == '@':
+					self.lambdas.append('\\')
 		self.lambda_map=lambda_indexed
 
 	def getbeards(self):
