@@ -61,54 +61,38 @@ class world:
 					#Rock falling straigth
 					if self.lambda_map[x][y-1] == ' ':
 						new_map[x][y] = ' '
-<<<<<<< HEAD
-						new_map[x][y-1] = '*'
-						ret = True
-=======
 						if horock and self.lambda_map[x][y-2] != ' ':
 							new_map[x][y-1] = '\\'
 						else:
 							new_map[x][y-1] = self.lambda_map[x][y]
->>>>>>> horocks
+						ret = True
 						self.am_i_dead((x,y-1))
 					#Rock rolling over rock to the right
 					if self.is_rock(self.lambda_map[x][y-1]) and self.lambda_map[x+1][y] == ' ' and self.lambda_map[x+1][y-1] == ' ':
 						new_map[x][y] = ' '
-<<<<<<< HEAD
-						new_map[x+1][y-1] = '*'
-						ret = True
-=======
 						if horock and self.lambda_map[x+1][y-2] != ' ':
 							new_map[x+1][y-1] = '\\'
 						else:
 							new_map[x+1][y-1] = self.lambda_map[x][y]
->>>>>>> horocks
+						ret = True
 						self.am_i_dead((x+1,y-1))
 					#Rock rolling over rock to the left
 					if self.is_rock(self.lambda_map[x][y-1]) and (self.lambda_map[x+1][y] != ' ' or self.lambda_map[x+1][y-1] != ' ') and self.lambda_map[x-1][y] == ' ' and self.lambda_map[x-1][y-1] == ' ':
 						new_map[x][y] = ' '
-<<<<<<< HEAD
-						new_map[x-1][y-1] = '*'
-						ret = True
-=======
 						if horock and self.lambda_map[x-1][y-2] != ' ':
 							new_map[x-1][y-1] = '\\'
 						else:
 							new_map[x-1][y-1] = self.lambda_map[x][y]
->>>>>>> horocks
+						ret = True
 						self.am_i_dead((x-1,y-1))
 					#Rock rolling over lambda to the right
 					if self.lambda_map[x][y-1] == '\\' and self.lambda_map[x+1][y] == ' ' and self.lambda_map[x+1][y-1] == ' ':
 						new_map[x][y] = ' '
-<<<<<<< HEAD
-						new_map[x+1][y-1] = '*'
-						ret = True
-=======
 						if horock and self.lambda_map[x+1][y-2] != ' ':
 							new_map[x+1][y-1] = '\\'
 						else:
 							new_map[x+1][y-1] = self.lambda_map[x][y]
->>>>>>> horocks
+						ret = True
 						self.am_i_dead((x+1,y-1))
 				# No lambdas left, opening lift
 				if self.lambda_map[x][y] == 'L' and len(self.lambdas) == 0:
@@ -150,16 +134,9 @@ class world:
 		self.killed=True
 
 	def move(self, x,y, xp,yp):
-<<<<<<< HEAD
-		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o' or self.lambda_map[xp][yp]=='!':
+		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o' or self.lambda_map[xp][yp] == '!':
 			if self.lambda_map[xp][yp] == '\\': # Pick up lambda
-				self.lambdas.remove((xp,yp))
-=======
-		self.last_points -= 1
-		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o':
-			if self.lambda_map[xp][yp] == '\\':
 				self.lambdas.remove('\\')
->>>>>>> horocks
 				self.last_points+=25
 			if self.lambda_map[xp][yp] == '!': # Pick up razor
 				self.wadlersbeard.pickupRazor()
@@ -167,24 +144,16 @@ class world:
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
 			return True
-<<<<<<< HEAD
 		# Pushing rock to the right
-		elif xp == x+1 and self.lambda_map[xp][yp] == '*' and self.lambda_map[x+2][y] == ' ':
-=======
 		elif xp == x+1 and self.is_rock(self.lambda_map[xp][yp]) and self.lambda_map[x+2][y] == ' ':
 			self.lambda_map[xp+1][yp] = self.lambda_map[xp][yp]
->>>>>>> horocks
 			self.lambda_map[xp][yp] = 'R'
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
 			return True
-<<<<<<< HEAD
 		# Pushing rock to the left
-		elif xp == x-1 and self.lambda_map[xp][yp] == '*' and self.lambda_map[x-2][y] == ' ':
-=======
 		elif xp == x-1 and self.is_rock(self.lambda_map[xp][yp]) and self.lambda_map[x-2][y] == ' ':
 			self.lambda_map[xp-1][yp] = self.lambda_map[xp][yp]
->>>>>>> horocks
 			self.lambda_map[xp][yp] = 'R'
 			self.lambda_map[x][y] = ' '
 			self.robotpos = (xp,yp)
