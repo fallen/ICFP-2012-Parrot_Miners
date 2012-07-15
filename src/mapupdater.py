@@ -137,6 +137,9 @@ class world:
 		self.killed=True
 
 	def move(self, x,y, xp,yp):
+		if xp > len(self.lambda_map)-1 or xp < 0 or yp < 0 or yp > len(self.lambda_map[0])-1:
+			pdb.set_trace()
+		#~ print self.lambda_map
 		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == 'o' or self.lambda_map[xp][yp] == '!':
 			if self.lambda_map[xp][yp] == '\\': # Pick up lambda
 				self.lambdas.remove('\\')
@@ -196,15 +199,25 @@ class world:
 		moved = False
 		self.shave=False # This is read if single_round to apply shave
 		if move == "U":
+			if self.robotpos[1] + 1 > len(self.lambda_map)-1:
+				return False
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]+1)
 		if move == "D":
+			if self.robotpos[1] - 1 < 0:
+				return False
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0], self.robotpos[1]-1)
 		if move == "L":
+			if self.robotpos[0] - 1 < 0:
+				return False
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]-1, self.robotpos[1])
 		if move == "R":
+			if self.robotpos[0] + 1 > len(self.lambda_map)-1:
+				return False
 			moved = self.move(self.robotpos[0], self.robotpos[1], self.robotpos[0]+1, self.robotpos[1])
+		
 		if not moved and move in ["U", "D", "L", "R"]:
 			return False
+			
 		if move == "S":
 			self.wadlersbeard.setFlagShave()
 			moved = True
@@ -222,7 +235,7 @@ class world:
 			return True
 		#~ if move == "W" and updated:
 			#~ pdb.set_trace()
-		if move=="W" and self.lambda_map[self.robotpos[0]+1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]-1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]+1] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]-1] not in ["."," "]:
+		if move=="W" and self.robotpos[0]+1 < len(self.lambda_map) and self.robotpos[0]-1 > 0 and self.robotpos[1]-1 > 0 and self.robotpos[1]+1 < len(self.lambda_map[0]) and self.lambda_map[self.robotpos[0]+1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]-1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]+1] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]-1] not in ["."," "]:
 			moved = True
 		return moved
 
