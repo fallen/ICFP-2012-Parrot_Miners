@@ -169,7 +169,6 @@ lambda_map=displayer.getmap()
 beards=displayer.getbeards()
 
 beardstuff=(razors,growth,beards)
-print beardstuff
 waterstuff=(water_value,flooding_value,waterproof_value)
 world = world(lambda_map, waterstuff, trampolines, beardstuff)
 

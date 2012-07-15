@@ -265,6 +265,9 @@ class wadlersbeard:
 	def setFlagShave(self,value=True):
 		self.robotwannashave=value
 
+	def hasBeards(self):
+		return len(self.beards) != 0
+
 	def wannaShave(self):
 		return self.robotwannashave
 
@@ -287,7 +290,9 @@ class wadlersbeard:
 					#9 cases checked even if only 8 are useful
 					self.shaveIfPossible(lambda_map,newmap,i,j)
 		else:
-			raise Exception("Can't shave without razors ! Should've used more canShave() !")
+			pass
+			#raise Exception("Can't shave without razors ! Should've used more canShave() !")
+
 
 	# Have we enough razors to shave ?
 	def canShave(self):
@@ -307,7 +312,7 @@ class wadlersbeard:
 			newbeards=[]
 			for (bx, by) in self.beards:
 				# for each beard, expand if possible. 9 cases checked even if only 8 are useful
-				print "Try expand beard "+str(bx)+" "+str(by)
+				#print "Try expand beard "+str(bx)+" "+str(by)
 				for x in [ bx+1, bx, bx-1 ] :
 					for y in [ by ,by+1,by-1 ]:
 						res=self.expandBeardIfPossible(lambda_map,newmap,x,y)

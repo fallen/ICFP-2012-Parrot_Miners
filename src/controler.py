@@ -13,6 +13,7 @@ def hash_the_world(world):
 	hasher = hashlib.sha1()
 	hasher.update(world.lambda_map.__str__())
 	hasher.update(world.waterworld.water.__str__())
+	hasher.update(world.wadlersbeard.__str__())
 	return hasher.digest()
 	
 class SimulatorDieEvent:
@@ -65,6 +66,7 @@ class explorerstate:
 		self.maxhopeaction = "W"
 		self.arrived_with_w = False
 		self.visited = False
+
 	def explore(self, move, ASV=None):
 		cworld = copy.deepcopy(self.world)
 		moved = cworld.set_movement(move)
@@ -105,7 +107,10 @@ class botcontroler(controler):
 	
 	def __init__(self, world):
 		controler.__init__(self, world)
-		self.actions = ["U", "R", "L", "D","W"]
+		
+		self.actions = ["U", "R", "L", "D", "W"]
+		if world.wadlersbeard.hasBeards():
+			self.actions.append("S")
 		self.ASV = {}
 		self.ASV[hash_the_world(world)] = explorerstate(world)
 		self.updated = False
@@ -201,7 +206,15 @@ class botcontroler(controler):
 		#~ print self.ASV[hash_the_world(self.world)]
 		#~ pdb.set_trace()
 		if not self.updated:
-			self.update()			
+			self.update()
+			f = open("saved_map","w")
+			stdout = sys.stdout
+			sys.stdout = f
+			print self.ASV[hash_the_world(self.world)]
+			print "**********************"
+			for value in self.ASV.values(): print value
+			sys.stdout = stdout
+			
 			self.updated = True
 			
 		world = self.world
