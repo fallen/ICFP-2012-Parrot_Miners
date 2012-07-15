@@ -1,0 +1,70 @@
+MASTER ( and trampolines )
+
+---
+Map flood1
+Route RLLRRRRRDDLLLLLLA
+Score = 284
+---
+Map flood2
+Route RRRLUUURRA
+Score = 141
+---
+Map flood3
+Route LLLUUUDRUUUDRRRRDRURUUDLULULDUA
+Score = 220
+---
+Map flood4
+Route URULULLLA
+Score = 92
+---
+Map flood5
+Route RRLLDRDRDRDA
+Score = 189
+---
+Map contest1
+Route LDLDRDRLULLDLRRA
+Score = 212<br>Mining complete
+---
+Map contest2
+Route RRRLLUUDRLUUDRDRRLULURRA
+Score = 177
+---
+Map contest3
+Route LRRDDDLLA
+Score = 92
+---
+Map contest4
+Route RRLLDRDRDDRRRLA
+Score = 236
+---
+Map contest5
+Route LLLUUUDRUUUDRRRRDRURUUDLULULDUA
+Score = 220
+---
+Map contest6
+Route RUURRRRLLLLLRRRRRRRRRRUUULLLULDDLULLDLLLUUURLUUUUURA
+Score = 499
+---
+Map contest7
+Route RDRRRDRLLRUDDLLLRURDLRRRDDRRRLA
+Score = 420
+---
+Map contest8
+Route RLRRRRRRA
+Score = 142
+---
+Map contest9
+Route LRRLUURRRDUA
+Score = 239
+---
+Map contest10
+Route UULRULUURLLDULLLLA
+Score = 283
+---
+Map trampoline1
+Route RDLRRRLLRULLA
+Score = 238
+---
+Map trampoline2
+Route UUDRDRRLDRRRDLLRDRA
+Score = 232
