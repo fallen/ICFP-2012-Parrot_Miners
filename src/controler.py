@@ -111,7 +111,7 @@ class botcontroler(controler):
 		controler.__init__(self, world)
 		
 		self.actions = ["U", "R", "L", "D"]
-		if world.wadlersbeard.hasBeards():
+		if world.hasBeard:
 
 			self.actions.append("S")
 		self.ASV = {}
