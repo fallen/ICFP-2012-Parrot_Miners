@@ -169,6 +169,8 @@ class botcontroler(controler):
 		
 	def recurse_update(self, world):
 		#if hash_the_world(world) in self.ASV.keys():
+		if self.time_max - time.clock() < 0:
+			raise RuntimeError
 		value = self.ASV[hash_the_world(world)]
 		#~ else:
 			#~ return
@@ -217,7 +219,13 @@ class botcontroler(controler):
 		#update each cell in reverse
 		for value in self.ASV.itervalues():
 			value.visited = False
-		self.recurse_update(self.world)
+		self.time_max = time.clock() + 9.0
+		try :
+			while 1:
+				self.recurse_update(self.world)
+		except RuntimeError:
+			print "exit"
+			pass
 		return True
 		
 	def get_next(self):

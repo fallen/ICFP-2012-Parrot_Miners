@@ -34,8 +34,6 @@ limiter_thread=None
 def handlerdebug(signum, frame):
 	print 'Signal ', signum, 'catched'
 	if signum == signal.SIGINT:
-		if not control.updated:
-			signal.setitimer(signal.ITIMER_REAL, 9)
 		print 'SIGINT, we exit !'
 		score = 0
 		route=""
@@ -75,8 +73,6 @@ def handlerdebug(signum, frame):
 
 def handler(signum, frame):
 	if signum == signal.SIGINT:
-		if not control.updated:
-			signal.setitimer(signal.ITIMER_REAL, 9)
 		#log = normallogger()
 		while 1:
 			nextmove = control.get_next()
