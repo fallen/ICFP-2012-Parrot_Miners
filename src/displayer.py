@@ -35,7 +35,7 @@ class MapDrawer:
 					t=(i,j)
 					self.beards.append(t)
 				if lambda_indexed[i][j].isdigit():
-					for trampoline, target in self.trampolines.interitems():
+					for trampoline, target in self.trampolines.iteritems():
 						if target == int(lambda_indexed[i][j]):
 							self.trampolines[trampoline] = (i, j)
 				if lambda_indexed[i][j] in self.possible_trampolines:
