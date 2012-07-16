@@ -186,6 +186,9 @@ class world:
 		self.last_points=-1
 		moved = False
 		self.shave=False # This is read if single_round to apply shave
+		if move == "S" and self.wadlersbeard.razors == 0:
+			return False
+			
 		if move == "U":
 			if self.robotpos[1] + 1 > len(self.lambda_map)-1:
 				return False
@@ -212,9 +215,9 @@ class world:
 		if move == "A":
 			self.last_points += 25 * (self.lambdasmax - len(self.lambdas))
 			moved = True
-		if move == "W":
-			moved = False
-			pass
+		#~ if move == "W":
+			#~ moved = False
+			#~ pass
 		#~ self.logger.write(move)
 		updated = self.single_round()
 		if self.waterworld != None:
@@ -223,8 +226,8 @@ class world:
 			return True
 		#~ if move == "W" and updated:
 			#~ pdb.set_trace()
-		if move=="W" and self.robotpos[0]+1 < len(self.lambda_map) and self.robotpos[0]-1 > 0 and self.robotpos[1]-1 > 0 and self.robotpos[1]+1 < len(self.lambda_map[0]) and self.lambda_map[self.robotpos[0]+1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]-1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]+1] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]-1] not in ["."," "]:
-			moved = True
+		#~ if move=="W" and self.robotpos[0]+1 < len(self.lambda_map) and self.robotpos[0]-1 > 0 and self.robotpos[1]-1 > 0 and self.robotpos[1]+1 < len(self.lambda_map[0]) and self.lambda_map[self.robotpos[0]+1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]-1][self.robotpos[1]] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]+1] not in ["."," "] and self.lambda_map[self.robotpos[0]][self.robotpos[1]-1] not in ["."," "]:
+			#~ moved = True
 		return moved
 
 		def __deepcopy__(self, memo):

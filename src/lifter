@@ -77,7 +77,7 @@ def handler(signum, frame):
 	if signum == signal.SIGINT:
 		if not control.updated:
 			signal.setitimer(signal.ITIMER_REAL, 9)
-		log = normallogger()
+		#log = normallogger()
 		while 1:
 			nextmove = control.get_next()
 			signal.alarm(0)
