@@ -167,8 +167,11 @@ class botcontroler(controler):
 		#pdb.set_trace()
 		return True
 		
-	def recurse_update(self, world):
+	def recurse_update(self, world, max_depth):
 		#if hash_the_world(world) in self.ASV.keys():
+		max_depth -=1
+		if max_depth == 0:
+			return
 		if self.time_max - time.clock() < 0:
 			raise RuntimeError
 		value = self.ASV[hash_the_world(world)]
@@ -186,12 +189,12 @@ class botcontroler(controler):
 			for i in value.actionsresults.iterkeys():
 				if value.actionsresults[i] != None:
 					if self.ASV[hash_the_world(value.actionsresults[i])].actionsresults != []:
-						value.maxhopeaction = value.actionsresults.keys()[0]
+						value.maxhopeaction = i
 			#~ print value.maxhopeaction
 			hopemax = -1500
 			for move in value.actionsresults.iterkeys():
 				if value.actionsresults[move] != None:
-						self.recurse_update(value.actionsresults[move])
+						self.recurse_update(value.actionsresults[move], max_depth)
 			#update value
 			for move in value.actionsresults.iterkeys():
 				if value.actionsresults[move] != None:
@@ -199,6 +202,8 @@ class botcontroler(controler):
 					if hopemove > hopemax:
 						hopemax = hopemove
 						value.maxhopeaction = move
+				else:
+					max_depth +=0.3
 			value.hope = hopemax
 
 				#~ if value.actionsresults[move] != None and hash_the_world(value.actionsresults[move]) in self.ASV:
@@ -220,9 +225,10 @@ class botcontroler(controler):
 		for value in self.ASV.itervalues():
 			value.visited = False
 		self.time_max = time.clock() + 9.0
+		max_depth = 18
 		try :
 			while 1:
-				self.recurse_update(self.world)
+				self.recurse_update(self.world, max_depth)
 		except RuntimeError:
 			print "exit"
 			pass
