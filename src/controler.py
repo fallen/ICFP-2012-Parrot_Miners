@@ -208,7 +208,7 @@ class botcontroler(controler):
 		
 	def update(self):
 		#update each cell in reverse
-		for value in self.ASV.values():
+		for value in self.ASV.itervalues():
 			value.visited = False
 		self.recurse_update(self.world)
 		return True

@@ -82,9 +82,10 @@ def handler(signum, frame):
 			nextmove = control.get_next()
 			signal.alarm(0)
 			world.set_movement(nextmove)
-			log.write(nextmove)
+#			log.write(nextmove)
+			sys.stdout.write(nextmove)
 			if nextmove == "A" or world.killed or world.won:
-				del log
+#				del log
 				exit(0)
 	
 	if signum == signal.SIGALRM:
