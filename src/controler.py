@@ -198,12 +198,14 @@ class botcontroler(controler):
 			#update value
 			for move in value.actionsresults.iterkeys():
 				if value.actionsresults[move] != None:
+					max_depth +=0.3
+			for move in value.actionsresults.iterkeys():
+				if value.actionsresults[move] != None:
 					hopemove = value.actionspoints[move] + self.ASV[hash_the_world(value.actionsresults[move])].hope
 					if hopemove > hopemax:
 						hopemax = hopemove
 						value.maxhopeaction = move
-				else:
-					max_depth +=0.3
+
 			value.hope = hopemax
 
 				#~ if value.actionsresults[move] != None and hash_the_world(value.actionsresults[move]) in self.ASV:
