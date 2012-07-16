@@ -223,6 +223,7 @@ class world:
 		if self.waterworld != None:
 			self.waterworld.tick(self.robotpos[1])
 		if (self.killed):
+			self.last_points -= 1500
 			return True
 		#~ if move == "W" and updated:
 			#~ pdb.set_trace()

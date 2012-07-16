@@ -59,6 +59,8 @@ class kcontroler(controler):
 		if key == "e":
 			return "S"
 
+ACTIONS = ["U", "R", "L", "D"]
+
 class explorerstate:
 	def __init__(self, world):
 		self.world = world
@@ -68,28 +70,23 @@ class explorerstate:
 		self.maxhopeaction = "A"
 		self.arrived_with_w = False
 		self.visited = False
-
-	def explore(self, move, ASV=None):
+		self.parent = None
+		
+	def explore(self, move, ASV):
 		cworld = copy.deepcopy(self.world)
-		moved = cworld.set_movement(move)
-		if moved:
-			if hash_the_world(cworld) not in ASV:
-				self.actionsresults[move] = cworld
-				self.actionspoints[move] = cworld.get_points()
-			else:
-				if move not in self.actionsresults or self.actionsresults[move] == None:
-					self.actionsresults[move] = ASV[hash_the_world(cworld)].world
-					self.actionspoints[move] = cworld.get_points()
-				else:
-					return False
+		if cworld.set_movement(move) and hash_the_world(cworld) not in ASV:
+			self.actionsresults[move] = explorerstate(cworld)
+			self.actionspoints[move] = cworld.get_points()
+			ASV[hash_the_world(cworld)] = self.actionsresults[move]
+			self.actionsresults[move].parent = self
+			return True
 		else:
-			if move not in self.actionsresults:
-				self.actionsresults[move] = None
-				self.actionspoints[move] = None
-		return moved
+			self.actionsresults[move] = None
+			self.actionspoints[move] = None
+		return False
 
 	def __str__(self):
-		print self.world
+		print hex(id(self))
 		MapDrawer(self.world.lambda_map,{}).draw()
 		#~ for key, value in self.actionsresults.iteritems():
 			#~ print key, " : "
@@ -101,6 +98,8 @@ class explorerstate:
 		print "scoring :", self.actionspoints
 		print "worlds :", self.actionsresults
 		print "visited :", self.visited
+		print "parent :", hex(id(self.parent))
+		
 		if self.arrived_with_w:
 			print "origin : W"
 		return ""
@@ -110,55 +109,39 @@ class botcontroler(controler):
 	def __init__(self, world):
 		controler.__init__(self, world)
 		
-		self.actions = ["U", "R", "L", "D"]
 		if world.hasBeard:
-
-			self.actions.append("S")
+			actions.append("S")
+			
 		self.ASV = {}
-		self.ASV[hash_the_world(world)] = explorerstate(world)
+		self.start = self.ASV[hash_the_world(world)] = explorerstate(world)
 		self.updated = False
-		for action in self.actions:
-			if self.ASV[hash_the_world(world)].explore(action, self.ASV):
-				self.ASV[hash_the_world(self.ASV[hash_the_world(world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(world)].actionsresults[action])
-				
-		#~ self.update()
+		for action in ACTIONS:
+			self.start.explore(action, self.ASV)
 	
-	def check_robot_near_beard(self,world):
-		robotpos=world.robotpos
-		lambda_map=world.lambda_map
-		shave_useful=False
-		for x in [robotpos[0] , robotpos[0] +1, robotpos[0] -1]:
-			for y in [robotpos[1],robotpos[1]+1,robotpos[1]-1]:
-				if lambda_map[x][y] == 'W':
-					shave_useful=True
-		return shave_useful and world.wadlersbeard.canShave()
-	
+	def update_parents(self, current):
+		if current == None or current == self.start:
+			return
+		current = current.parent
+		hopemax = -1500
+		for move in current.actionsresults:
+			if current.actionsresults[move] != None:
+				hopemove = current.actionspoints[move] + current.actionsresults[move].hope
+				if hopemove > hopemax:
+					hopemax = hopemove
+					current.maxhopeaction = move
+										
+		self.update_parents(current.parent)
+			
 	def explore_step(self):
-		ret = False
-		world = self.world
-		updatable_world = None
 		
-		for value in self.ASV.iterkeys():
-			if len(self.ASV[value].actionsresults) == 0:
-				updatable_world = self.ASV[value].world
-				break
-
-		if updatable_world:
-			if "S" in self.actions and not self.check_robot_near_beard(updatable_world):
-				self.actions.remove("S")
-			for action in self.actions:
-				if self.ASV[hash_the_world(updatable_world)].explore(action, self.ASV) :
-					if hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action]) not in self.ASV:
-						self.ASV[hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action])] = explorerstate(self.ASV[hash_the_world(updatable_world)].actionsresults[action])
-						#~ if action == "W":
-							#~ self.ASV[hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action])].arrived_with_w = True
-			#~ print "************* END ****************************"
-			#~ for value in self.ASV.values(): print value
-			#print len(self.ASV)
-			#~ print "*****************************************"
-			return True
-		else:
-			return False
+		for value in self.ASV.itervalues():
+			if len(value.actionsresults) == 0:
+				for action in ACTIONS:
+					value.explore(action, self.ASV)
+				self.update_parents(value)
+				return True
+		
+		return False
 			
 		#~ print "************* END ****************************"
 		#~ for value in self.ASV.values(): print value
@@ -166,74 +149,7 @@ class botcontroler(controler):
 		#~ print "*****************************************"
 		#pdb.set_trace()
 		return True
-		
-	def recurse_update(self, world, max_depth):
-		#if hash_the_world(world) in self.ASV.keys():
-		max_depth -=1
-		if max_depth == 0:
-			return
-		if self.time_max - time.clock() < 0:
-			raise RuntimeError
-		value = self.ASV[hash_the_world(world)]
-		#~ else:
-			#~ return
-		if value.visited:
-			return
-		value.visited = True
-		#initialize to a possible path
-		if value.world.killed:
-			value.hope = -1500
-			value.visited = True
-			return
-		if len(value.actionsresults) > 0:
-			for i in value.actionsresults.iterkeys():
-				if value.actionsresults[i] != None:
-					if self.ASV[hash_the_world(value.actionsresults[i])].actionsresults != []:
-						value.maxhopeaction = i
-			#~ print value.maxhopeaction
-			hopemax = -1500
-			for move in value.actionsresults.iterkeys():
-				if value.actionsresults[move] != None:
-						self.recurse_update(value.actionsresults[move], max_depth)
-			#update value
-			for move in value.actionsresults.iterkeys():
-				if value.actionsresults[move] != None:
-					hopemove = value.actionspoints[move] + self.ASV[hash_the_world(value.actionsresults[move])].hope
-					if hopemove > hopemax:
-						hopemax = hopemove
-						value.maxhopeaction = move
-				else:
-					max_depth +=0.3
-			value.hope = hopemax
 
-				#~ if value.actionsresults[move] != None and hash_the_world(value.actionsresults[move]) in self.ASV:
-						#~ hopemove = value.actionspoints[move] + self.ASV[hash_the_world(value.actionsresults[move])].hope
-					#	print hopemove, hopemax
-						#~ if hopemove > hopemax:
-							#~ hopemax = hopemove
-							#~ value.maxhopeaction = move
-							#~ updated = True
-				#~ value.hope = hopemax
-		#~ for value in self.ASV.values(): print value
-		#~ print len(self.ASV)
-		#~ print "*****************************************"
-		#~ print self.ASV[hash_the_world(self.world)]
-		#~ pdb.set_trace()
-		
-	def update(self):
-		#update each cell in reverse
-		for value in self.ASV.itervalues():
-			value.visited = False
-		self.time_max = time.clock() + 9.0
-		max_depth = 18
-		try :
-			while 1:
-				self.recurse_update(self.world, max_depth)
-		except RuntimeError:
-			print "exit"
-			pass
-		return True
-		
 	def get_next(self):
 		#for value in self.ASV.values(): print value
 		#print len(self.ASV)
@@ -242,24 +158,22 @@ class botcontroler(controler):
 		#~ pdb.set_trace()
 		if not self.updated:
 			self.updated = True
-			self.update()
-#			f = open("saved_map","w")
-#			stdout = sys.stdout
-#			sys.stdout = f
-#			print self.ASV[hash_the_world(self.world)]
-#			print "**********************"
-#			for value in self.ASV.values(): print value
-#			sys.stdout = stdout
+			#~ self.update()
+			f = open("saved_map","w")
+			stdout = sys.stdout
+			sys.stdout = f
+			print self.start
+			print "**********************"
+			for value in self.ASV.values(): print value
+			sys.stdout = stdout
 			
 			
-		world = self.world
+		state = self.start
 		if not world :
 			return "A"
-		if hash_the_world(world) not in self.ASV:
-			return "A"
-		action = self.ASV[hash_the_world(world)].maxhopeaction
+		action = state.maxhopeaction
 		if action != "A":
-			if action not in self.ASV[hash_the_world(world)].actionsresults:
+			if action not in state.actionsresults:
 				return "A"
-			self.world = self.ASV[hash_the_world(world)].actionsresults[action]
+			self.start = state.actionsresults[action]
 		return action
