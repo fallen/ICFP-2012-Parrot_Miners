@@ -206,16 +206,16 @@ class botcontroler(controler):
 		#~ print self.ASV[hash_the_world(self.world)]
 		#~ pdb.set_trace()
 		if not self.updated:
-			self.update()
-			f = open("saved_map","w")
-			stdout = sys.stdout
-			sys.stdout = f
-			print self.ASV[hash_the_world(self.world)]
-			print "**********************"
-			for value in self.ASV.values(): print value
-			sys.stdout = stdout
-			
 			self.updated = True
+			self.update()
+#			f = open("saved_map","w")
+#			stdout = sys.stdout
+#			sys.stdout = f
+#			print self.ASV[hash_the_world(self.world)]
+#			print "**********************"
+#			for value in self.ASV.values(): print value
+#			sys.stdout = stdout
+			
 			
 		world = self.world
 		if not world :

@@ -34,11 +34,17 @@ limiter_thread=None
 def handlerdebug(signum, frame):
 	print 'Signal ', signum, 'catched'
 	if signum == signal.SIGINT:
+		if not control.updated:
+			signal.setitimer(signal.ITIMER_REAL, 9)
 		print 'SIGINT, we exit !'
 		score = 0
+		route=""
 		while 1:
 			try:
 				nextmove = control.get_next()
+				signal.alarm(0)
+				route+=nextmove
+				print "Route : ", route
 				world.set_movement(nextmove)					
 				score += world.get_points()
 				os.system("clear")
@@ -61,24 +67,38 @@ def handlerdebug(signum, frame):
 		print 'SIGTERM, we exit as well, did we miss SIGINT ??'
 		cont.set_movement("A")
 		reset_tty_and_exit()
+	if signum == signal.SIGALRM:
+		print 'SIGALRM, we need to stop updating right now !'
+		if not control.updated:
+			handlerdebug(signal.SIGINT, frame)
+
 
 def handler(signum, frame):
 	if signum == signal.SIGINT:
+		if not control.updated:
+			signal.setitimer(signal.ITIMER_REAL, 9)
 		log = normallogger()
 		while 1:
 			nextmove = control.get_next()
+			signal.alarm(0)
 			world.set_movement(nextmove)
 			log.write(nextmove)
 			if nextmove == "A" or world.killed or world.won:
 				del log
 				exit(0)
+	
+	if signum == signal.SIGALRM:
+		#print 'SIGALRM, we need to stop updating right now !'
+		handler(signal.SIGINT, frame)
 			
 if debug :
 	signal.signal(signal.SIGINT, handlerdebug)
 	signal.signal(signal.SIGTERM, handlerdebug)
+	signal.signal(signal.SIGALRM, handlerdebug) 
 else:
 	signal.signal(signal.SIGINT, handler)
 	signal.signal(signal.SIGTERM, handler)
+	signal.signal(signal.SIGALRM, handler)
 	
 #time.clock() returns cpu time for the whole process (under linux/unix)
 #wait on locks or IO are not included
@@ -222,7 +242,6 @@ if debug and sys.argv[1] == "botcontroler":
 		except:
 			SimulatorDieEvent.stop_that.set()
 			raise
-	
 
 
 #no debug mode
