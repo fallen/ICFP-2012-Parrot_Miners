@@ -18,7 +18,7 @@ class world:
 			self.death_cause=None
 			self.waterworld=waterworld(self,waterstuff)
 			self.trampolines=trampstuff[0]
-			self.trampolines_positions=trampstuff[1]
+			self.trampoline_position=trampstuff[1]
 			self.robotpos=robotpos
 			self.lambdas=lambdas
 			self.possible_trampolines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
