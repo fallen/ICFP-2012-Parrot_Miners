@@ -120,7 +120,16 @@ class botcontroler(controler):
 				
 		#~ self.update()
 	
-			
+	def check_robot_near_beard(self,world):
+		robotpos=world.robotpos
+		lambda_map=world.lambda_map
+		shave_useful=False
+		for x in [robotpos[0] , robotpos[0] +1, robotpos[0] -1]:
+			for y in [robotpos[1],robotpos[1]+1,robotpos[1]-1]:
+				if lambda_map[x][y] == 'W':
+					shave_useful=True
+		return shave_useful and world.wadlersbeard.canShave()
+	
 	def explore_step(self):
 		ret = False
 		world = self.world
@@ -130,8 +139,10 @@ class botcontroler(controler):
 			if len(self.ASV[value].actionsresults) == 0:
 				updatable_world = self.ASV[value].world
 				break
-				
+
 		if updatable_world:
+			if "S" in self.actions and not self.check_robot_near_beard(updatable_world):
+				self.actions.remove("S")
 			for action in self.actions:
 				if self.ASV[hash_the_world(updatable_world)].explore(action, self.ASV) :
 					if hash_the_world(self.ASV[hash_the_world(updatable_world)].actionsresults[action]) not in self.ASV:
@@ -154,7 +165,10 @@ class botcontroler(controler):
 		return True
 		
 	def recurse_update(self, world):
-		value = self.ASV[hash_the_world(world)]
+		if hash_the_world(world) in self.ASV.keys():
+			value = self.ASV[hash_the_world(world)]
+		else:
+			return
 		if value.visited:
 			return
 		value.visited = True
@@ -175,9 +189,7 @@ class botcontroler(controler):
 						hopemax = hopemove
 						value.maxhopeaction = move
 			value.hope = hopemax
-		
-				
-				
+
 				#~ if value.actionsresults[move] != None and hash_the_world(value.actionsresults[move]) in self.ASV:
 						#~ hopemove = value.actionspoints[move] + self.ASV[hash_the_world(value.actionsresults[move])].hope
 					#	print hopemove, hopemax

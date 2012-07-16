@@ -203,7 +203,7 @@ class world:
 		
 		if not moved and move in ["U", "D", "L", "R"]:
 			return False
-			
+		
 		if move == "S":
 			self.wadlersbeard.setFlagShave()
 			moved = True
@@ -293,7 +293,7 @@ class wadlersbeard:
 	def __str__(self):
 		res="Razors "+str(self.razors)+"\n"
 		res=res+"Growth counter "+str(self.counter)+"\n"
-		#res=res+"Beards coordinates "+str(self.beards)
+		res=res+"Beards coordinates "+str(self.beards)
 		return res
 
 	def startUpdate(self):
