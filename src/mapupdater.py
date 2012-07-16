@@ -25,8 +25,10 @@ class world:
 			self.wadlersbeard=wadlersbeard(beardstuff)
 			self.cols = range(len(self.lambda_map))
 			self.rows = range(len(self.lambda_map[0]))
-
 			self.lambdasmax = len(self.lambdas)
+			self.hasBeard = self.wadlersbeard.hasBeards()
+			self.hasWater = (waterstuff[0] == 0) and (waterstuff[1] == 0)
+			self.hasTrampolines = len(trampstuff[0]) != 0
 
 	def get_points(self):
 		return self.last_points
@@ -171,7 +173,7 @@ class world:
 			self.lambda_map[x][y] = ' '
 			# Searching for other trampolines targetting the same target
 			# in order to delete them
-			for trampoline in self.trampolines.keys():
+			for trampoline in self.trampolines.iterkeys():
 				if self.trampolines[trampoline] == (a,b):
 					(tx, ty) = self.trampoline_position[trampoline]
 					self.lambda_map[tx][ty] = ' '
@@ -229,10 +231,26 @@ class world:
 			newworld = world(copy.deepcopy(self.lambda_map, memo))
 			newworld.cols = self.cols
 			newworld.rows = self.rows
-			newworld.waterworld = copy.deepcopy(self.waterworld, memo)
-			newworld.wadlersbeard = copy.deepcopy(self.wadlersbeard, memo)
-			newworld.trampolines = copy.deepcopy(self.trampolines, memo)
-			newworld.trampoline_position = copy.deepcopy(self.trampoline_position, memo)
+
+			if self.hasWater:
+				newworld.waterworld = copy.deepcopy(self.waterworld, memo)
+				newworld.hasWater = True
+			else:
+				newworld.hasWater = False
+
+			if self.hasBeards:
+				newworld.wadlersbeard = copy.deepcopy(self.wadlersbeard, memo)
+				newworld.hasBeards = True
+			else:
+				newworld.hasBeards = False
+
+			if self.hasTrampolines:
+				newworld.trampolines = copy.deepcopy(self.trampolines, memo)
+				newworld.trampoline_position = copy.deepcopy(self.trampoline_position, memo)
+				newworld.hasTrampolines = True
+			else:
+				newworld.hasTrampolines = False
+
 			newworld.robotpos = self.robotpos
 			newworld.lambdasmax = self.lambdasmax
 			newworld.lambdas = copy.deepcopy(self.lambdas, memo)

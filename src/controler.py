@@ -12,8 +12,10 @@ import hashlib
 def hash_the_world(world):
 	hasher = hashlib.sha1()
 	hasher.update(world.lambda_map.__str__())
-	hasher.update(world.waterworld.water.__str__())
-	hasher.update(world.wadlersbeard.__str__())
+	if (world.hasWater):
+		hasher.update(world.waterworld.water.__str__())
+	if (world.hasBeard):
+		hasher.update(world.wadlersbeard.__str__())
 	return hasher.digest()
 	
 class SimulatorDieEvent:
@@ -109,7 +111,7 @@ class botcontroler(controler):
 		controler.__init__(self, world)
 		
 		self.actions = ["U", "R", "L", "D", "W"]
-		if world.wadlersbeard.hasBeards():
+		if world.hasBeard:
 			self.actions.append("S")
 		self.ASV = {}
 		self.ASV[hash_the_world(world)] = explorerstate(world)
@@ -135,7 +137,7 @@ class botcontroler(controler):
 		world = self.world
 		updatable_world = None
 		
-		for value in self.ASV.keys():
+		for value in self.ASV.iterkeys():
 			if len(self.ASV[value].actionsresults) == 0:
 				updatable_world = self.ASV[value].world
 				break
@@ -178,11 +180,11 @@ class botcontroler(controler):
 			return
 		if len(value.actionsresults) > 0:
 			hopemax = -1500
-			for move in value.actionsresults.keys():
+			for move in value.actionsresults.iterkeys():
 				if value.actionsresults[move] != None:
 						self.recurse_update(value.actionsresults[move])
 			#update value
-			for move in value.actionsresults.keys():
+			for move in value.actionsresults.iterkeys():
 				if value.actionsresults[move] != None:
 					hopemove = value.actionspoints[move] + self.ASV[hash_the_world(value.actionsresults[move])].hope
 					if hopemove > hopemax:
