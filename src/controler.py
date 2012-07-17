@@ -11,7 +11,7 @@ import hashlib
 			
 def hash_the_world(world):
 	hasher = hashlib.sha1()
-	hasher.update(world.lambda_map.__str__())
+	hasher.update(world.lambda_map.__str__().replace(".", " "))
 	if (world.hasWater):
 		hasher.update(world.waterworld.water.__str__())
 	if (world.hasBeard):
@@ -66,7 +66,7 @@ class explorerstate:
 		self.world = world
 		self.actionsresults = {}
 		self.actionspoints = {}
-		self.hope = 0
+		self.hope = -1500
 		self.maxhopeaction = "A"
 		self.visited = False
 		
@@ -127,7 +127,8 @@ class botcontroler(controler):
 			
 	def explore_step(self):
 		trace = []
-		curiosity = 10
+		curiosity = 25
+		
 		current = self.start
 		trace.append(current)
 		#~ print "exploring_step"
