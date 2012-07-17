@@ -3,8 +3,7 @@ import sys
 import pdb
 
 class world:
-
-	def __init__(self, lambda_map,robotpos,lambdas, trampstuff, waterstuff=None, beardstuff=None):
+	def __init__(self, lambda_map,robotpos=None,lambdas=None, trampstuff=None, waterstuff=None, beardstuff=None):
 		if (waterstuff == None):
 			self.lambda_map = lambda_map
 		else:
@@ -21,10 +20,11 @@ class world:
 			self.trampoline_position=trampstuff[1]
 			self.robotpos=robotpos
 			self.lambdas=lambdas
-			self.possible_trampolines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 			self.wadlersbeard=wadlersbeard(beardstuff)
-			self.cols = range(len(self.lambda_map))
-			self.rows = range(len(self.lambda_map[0]))
+			self.num_cols = len(self.lambda_map)
+			self.num_rows = len(self.lambda_map[0])
+			self.cols = range(self.num_cols)
+			self.rows = range(self.num_rows)
 			self.lambdasmax = len(self.lambdas)
 			self.hasBeard = self.wadlersbeard.hasBeards()
 			self.hasWater = (waterstuff[0] == 0) and (waterstuff[1] == 0)
@@ -235,6 +235,8 @@ class world:
 			newworld = world(copy.deepcopy(self.lambda_map, memo))
 			newworld.cols = self.cols
 			newworld.rows = self.rows
+			newworld.num_cols = self.num_cols
+			newworld.num_rows = self.num_rows
 
 			if self.hasWater:
 				newworld.waterworld = copy.deepcopy(self.waterworld, memo)

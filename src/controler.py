@@ -128,15 +128,18 @@ class botcontroler(controler):
 			
 	def explore_step(self):
 		trace = []
+		trace_len = 0
 		curiosity = 25
 		
 		current = self.start
 		trace.append(current)
 		#~ print "exploring_step"
-		while current and not (current.world.killed) and len(trace) < len(self.start.world.lambda_map) * len(self.start.world.lambda_map[0]):
+		trace_max = self.start.world.num_cols * self.start.world.num_rows
+		ACTIONS_len = len(ACTIONS)
+		while current and not (current.world.killed) and trace_len < trace_max:
 			randomize = False
 			# check if we can still move
-			if len(current.actionsresults) == len(ACTIONS):
+			if len(current.actionsresults) == ACTIONS_len:
 				breakable = True
 				for i in ACTIONS:
 					if current.actionsresults[i] != None and current.actionsresults[i] not in trace:
@@ -162,6 +165,8 @@ class botcontroler(controler):
 			if current.actionsresults[next_move] and current.actionsresults[next_move] not in trace:
 				current = current.actionsresults[next_move]
 				trace.append(current)
+				# Better to have a variable to record trace length instead of calculating it over and over again
+				trace_len += 1
 		#pdb.set_trace()
 		trace.reverse()
 		#~ reverse_start = current
@@ -199,7 +204,7 @@ class botcontroler(controler):
 			#~ sys.stdout = stdout
 			
 		self.solution_trace_len +=1
-		if self.solution_trace_len > len(self.start.world.lambda_map) * len(self.start.world.lambda_map[0]):
+		if self.solution_trace_len > self.start.world.num_cols * self.start.world.num_rows:
 			return "A"
 		state = self.start
 		if not world :

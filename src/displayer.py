@@ -3,6 +3,7 @@
 
 class MapDrawer:
 	
+	possible_trampolines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 	def __init__(self,lambda_map,trampolines):
 		#Map from input uses first index for lines, we want it for columns
 		self.height=len(lambda_map)
@@ -10,7 +11,6 @@ class MapDrawer:
 		#Here, lambda_map is "raw" ie. indexing came from input
 		self.lambda_map=lambda_map
 		self.beards=[]
-		self.possible_trampolines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 		self.trampolines=trampolines
 		self.trampoline_position = {}
 		self.lambdas=[]
@@ -38,7 +38,7 @@ class MapDrawer:
 					for trampoline, target in self.trampolines.iteritems():
 						if target == int(lambda_indexed[i][j]):
 							self.trampolines[trampoline] = (i, j)
-				if lambda_indexed[i][j] in self.possible_trampolines:
+				if lambda_indexed[i][j] in MapDrawer.possible_trampolines:
 					self.trampoline_position[lambda_indexed[i][j]] = (i,j)
 				if lambda_indexed[i][j] == 'R':
 					self.robotpos = (i,j)
