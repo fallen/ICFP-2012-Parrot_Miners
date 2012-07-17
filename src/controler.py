@@ -113,6 +113,7 @@ class botcontroler(controler):
 		self.ASV = {}
 		self.start = self.ASV[hash_the_world(world)] = explorerstate(world)
 		self.updated = False
+		self.solution_trace_len = 0
 			
 	def update(self, current):
 		hopemax = -1500
@@ -183,20 +184,21 @@ class botcontroler(controler):
 		#~ print "*****************************************"
 		#~ print self.ASV[hash_the_world(self.world)]
 		#~ pdb.set_trace()
-		print "called get next"
-		if not self.updated:
-			print "saving map"
-			self.updated = True
+		#~ if not self.updated:
+			#~ print "saving map"
+			#~ self.updated = True
 			#~ self.update()
-			f = open("saved_map","w")
-			stdout = sys.stdout
-			sys.stdout = f
-			print self.start
-			print "**********************"
-			for value in self.ASV.values(): print value
-			sys.stdout = stdout
+			#~ f = open("saved_map","w")
+			#~ stdout = sys.stdout
+			#~ sys.stdout = f
+			#~ print self.start
+			#~ print "**********************"
+			#~ for value in self.ASV.values(): print value
+			#~ sys.stdout = stdout
 			
-			
+		self.solution_trace_len +=1
+		if self.solution_trace_len > len(self.start.world.lambda_map) * len(self.start.world.lambda_map[0]):
+			return "A"
 		state = self.start
 		if not world :
 			return "A"
