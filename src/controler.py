@@ -73,13 +73,14 @@ class explorerstate:
 	def explore(self, move, ASV):
 		cworld = copy.deepcopy(self.world)
 		if cworld.set_movement(move):
-			if hash_the_world(cworld) not in ASV:
+			cworld_hash = hash_the_world(cworld)
+			if cworld_hash not in ASV:
 				self.actionsresults[move] = explorerstate(cworld)
 				self.actionspoints[move] = cworld.get_points()
-				ASV[hash_the_world(cworld)] = self.actionsresults[move]
+				ASV[cworld_hash] = self.actionsresults[move]
 				return True
 			else:
-				self.actionsresults[move] = ASV[hash_the_world(cworld)]
+				self.actionsresults[move] = ASV[cworld_hash]
 				self.actionspoints[move] = cworld.get_points()
 		
 		else:
