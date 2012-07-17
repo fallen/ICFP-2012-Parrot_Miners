@@ -126,8 +126,6 @@ class world:
 		self.killed=True
 
 	def move(self, x,y, xp,yp):
-		if xp > len(self.lambda_map)-1 or xp < 0 or yp < 0 or yp > len(self.lambda_map[0])-1:
-			pdb.set_trace()
 		if self.lambda_map[xp][yp] == ' ' or self.lambda_map[xp][yp] == '.' or self.lambda_map[xp][yp] == '\\' or self.lambda_map[xp][yp] == '!':
 			if self.lambda_map[xp][yp] == '\\': # Pick up lambda
 				self.lambdas.remove('\\')

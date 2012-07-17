@@ -66,7 +66,7 @@ class explorerstate:
 		self.world = world
 		self.actionsresults = {}
 		self.actionspoints = {}
-		self.hope = -1500
+		self.hope = 0
 		self.maxhopeaction = "A"
 		self.visited = False
 		
@@ -118,6 +118,9 @@ class botcontroler(controler):
 			
 	def update(self, current):
 		hopemax = -1500
+		if current.world.won:
+			current.hope = current.world.get_points()
+			return
 		for move in current.actionsresults:
 			if current.actionsresults[move] != None:
 				hopemove = current.actionspoints[move] + current.actionsresults[move].hope
@@ -129,14 +132,14 @@ class botcontroler(controler):
 	def explore_step(self):
 		trace = []
 		trace_len = 0
-		curiosity = 25
+		curiosity = 10
 		
 		current = self.start
 		trace.append(current)
 		#~ print "exploring_step"
 		trace_max = self.start.world.num_cols * self.start.world.num_rows
 		ACTIONS_len = len(ACTIONS)
-		while current and not (current.world.killed) and trace_len < trace_max:
+		while current and not current.world.won and not (current.world.killed) and trace_len < trace_max:
 			randomize = False
 			# check if we can still move
 			if len(current.actionsresults) == ACTIONS_len:
@@ -168,6 +171,7 @@ class botcontroler(controler):
 				# Better to have a variable to record trace length instead of calculating it over and over again
 				trace_len += 1
 		#pdb.set_trace()
+		trace.pop()
 		trace.reverse()
 		#~ reverse_start = current
 		#~ while reverse_start != self.start:
