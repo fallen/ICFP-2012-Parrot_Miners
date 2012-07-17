@@ -40,7 +40,6 @@ def handlerdebug(signum, frame):
 		while 1:
 			try:
 				nextmove = control.get_next()
-				signal.alarm(0)
 				route+=nextmove
 				print "Route : ", route
 				world.set_movement(nextmove)					
@@ -65,37 +64,23 @@ def handlerdebug(signum, frame):
 		print 'SIGTERM, we exit as well, did we miss SIGINT ??'
 		cont.set_movement("A")
 		reset_tty_and_exit()
-	if signum == signal.SIGALRM:
-		print 'SIGALRM, we need to stop updating right now !'
-		if not control.updated:
-			handlerdebug(signal.SIGINT, frame)
 
 
 def handler(signum, frame):
 	if signum == signal.SIGINT:
-		#log = normallogger()
 		while 1:
 			nextmove = control.get_next()
-			signal.alarm(0)
 			world.set_movement(nextmove)
-#			log.write(nextmove)
 			sys.stdout.write(nextmove)
 			if nextmove == "A" or world.killed or world.won:
-#				del log
 				exit(0)
-	
-	if signum == signal.SIGALRM:
-		#print 'SIGALRM, we need to stop updating right now !'
-		handler(signal.SIGINT, frame)
 			
 if debug :
 	signal.signal(signal.SIGINT, handlerdebug)
 	signal.signal(signal.SIGTERM, handlerdebug)
-	signal.signal(signal.SIGALRM, handlerdebug) 
 else:
 	signal.signal(signal.SIGINT, handler)
 	signal.signal(signal.SIGTERM, handler)
-	signal.signal(signal.SIGALRM, handler)
 	
 #time.clock() returns cpu time for the whole process (under linux/unix)
 #wait on locks or IO are not included
@@ -105,13 +90,11 @@ def limiter_simulator():
 		if time.clock() > 160:
 			print >> sys.stderr, "Sending SIGTERM"
 			os.kill(os.getpid(), signal.SIGTERM)
-#			handlerdebug(signal.SIGTERM,None)
 			print "Simulator died"
 			return
 		if time.clock() > 150: #will return true if flag is set
 			print >> sys.stderr,  "Sending SIGINT"
 			os.kill(os.getpid(), signal.SIGINT)
-#			handlerdebug(signal.SIGINT,None)
 			print "Simulator died"
 			return
 	return
@@ -231,7 +214,6 @@ if debug and sys.argv[1] == "botcontroler":
 	while 1:
 		try:
 			explore_state = control.explore_step()
-			#~ update_state = control.update()
 			if not explore_state:
 				handlerdebug(signal.SIGINT,None)
 				SimulatorDieEvent.stop_that.set()
