@@ -70,16 +70,22 @@ class explorerstate:
 		self.maxhopeaction = "A"
 		self.arrived_with_w = False
 		self.visited = False
-		self.parent = None
+		self.parents = []
 		
 	def explore(self, move, ASV):
 		cworld = copy.deepcopy(self.world)
-		if cworld.set_movement(move) and hash_the_world(cworld) not in ASV:
-			self.actionsresults[move] = explorerstate(cworld)
-			self.actionspoints[move] = cworld.get_points()
-			ASV[hash_the_world(cworld)] = self.actionsresults[move]
-			self.actionsresults[move].parent = self
-			return True
+		if cworld.set_movement(move):
+			if hash_the_world(cworld) not in ASV:
+				self.actionsresults[move] = explorerstate(cworld)
+				self.actionspoints[move] = cworld.get_points()
+				ASV[hash_the_world(cworld)] = self.actionsresults[move]
+				self.actionsresults[move].parent.append(self)
+				return True
+			else:
+				self.actionsresults[move] = ASV[hash_the_world(cworld)]
+				self.actionspoints[move] = cworld.get_points()
+				self.actionsresults[move].parents.append(self)
+		
 		else:
 			self.actionsresults[move] = None
 			self.actionspoints[move] = None
@@ -98,7 +104,7 @@ class explorerstate:
 		print "scoring :", self.actionspoints
 		print "worlds :", self.actionsresults
 		print "visited :", self.visited
-		print "parent :", hex(id(self.parent))
+		print "parent :", self.parents
 		
 		if self.arrived_with_w:
 			print "origin : W"
@@ -115,33 +121,33 @@ class botcontroler(controler):
 		self.ASV = {}
 		self.start = self.ASV[hash_the_world(world)] = explorerstate(world)
 		self.updated = False
-		for action in ACTIONS:
-			self.start.explore(action, self.ASV)
-	
+			
 	def update_parents(self, current):
-		if current == None or current == self.start:
-			return
-		current = current.parent
-		hopemax = -1500
-		for move in current.actionsresults:
-			if current.actionsresults[move] != None:
-				hopemove = current.actionspoints[move] + current.actionsresults[move].hope
-				if hopemove > hopemax:
-					hopemax = hopemove
-					current.maxhopeaction = move
-										
-		self.update_parents(current.parent)
+		if len(current.parents) != 0:
+			for parent in current.parents:
+				hopemax = -1500
+				for move in parent.actionsresults:
+					if parent.actionsresults[move] != None:
+						hopemove = parent.actionspoints[move] + parent.actionsresults[move].hope
+						if hopemove > hopemax:
+							hopemax = hopemove
+							parent.maxhopeaction = move
+
 			
 	def explore_step(self):
+		current = self.start
+		while(1):
+			random.seed = time.clock()
+			randmove = random.randint(0,len(ACTIONS)+len(current.parents))
+			if randmove > len(ACTIONS):
+				pdb.set_trace()
+				current = current.parents[randmove - len(ACTIONS)]
+			current.explore(randmove, self.ASV)
+			if current.actionsresults[randmove] != None:
+				current = current.actionsresults[randmove]
+				self.update_parents(current)
 		
-		for value in self.ASV.itervalues():
-			if len(value.actionsresults) == 0:
-				for action in ACTIONS:
-					value.explore(action, self.ASV)
-				self.update_parents(value)
-				return True
-		
-		return False
+		return True
 			
 		#~ print "************* END ****************************"
 		#~ for value in self.ASV.values(): print value
