@@ -68,9 +68,7 @@ class explorerstate:
 		self.actionspoints = {}
 		self.hope = 0
 		self.maxhopeaction = "A"
-		self.arrived_with_w = False
 		self.visited = False
-		self.parents = []
 		
 	def explore(self, move, ASV):
 		cworld = copy.deepcopy(self.world)
@@ -79,12 +77,10 @@ class explorerstate:
 				self.actionsresults[move] = explorerstate(cworld)
 				self.actionspoints[move] = cworld.get_points()
 				ASV[hash_the_world(cworld)] = self.actionsresults[move]
-				self.actionsresults[move].parent.append(self)
 				return True
 			else:
 				self.actionsresults[move] = ASV[hash_the_world(cworld)]
 				self.actionspoints[move] = cworld.get_points()
-				self.actionsresults[move].parents.append(self)
 		
 		else:
 			self.actionsresults[move] = None
@@ -104,10 +100,6 @@ class explorerstate:
 		print "scoring :", self.actionspoints
 		print "worlds :", self.actionsresults
 		print "visited :", self.visited
-		print "parent :", self.parents
-		
-		if self.arrived_with_w:
-			print "origin : W"
 		return ""
 
 class botcontroler(controler):
@@ -122,31 +114,60 @@ class botcontroler(controler):
 		self.start = self.ASV[hash_the_world(world)] = explorerstate(world)
 		self.updated = False
 			
-	def update_parents(self, current):
-		if len(current.parents) != 0:
-			for parent in current.parents:
-				hopemax = -1500
-				for move in parent.actionsresults:
-					if parent.actionsresults[move] != None:
-						hopemove = parent.actionspoints[move] + parent.actionsresults[move].hope
-						if hopemove > hopemax:
-							hopemax = hopemove
-							parent.maxhopeaction = move
-
+	def update(self, current):
+		hopemax = -1500
+		for move in current.actionsresults:
+			if current.actionsresults[move] != None:
+				hopemove = current.actionspoints[move] + current.actionsresults[move].hope
+				if hopemove > hopemax:
+					hopemax = hopemove
+					current.maxhopeaction = move
+		current.hope = hopemax
 			
 	def explore_step(self):
+		trace = []
+		curiosity = 10
 		current = self.start
-		while(1):
+		trace.append(current)
+		#~ print "exploring_step"
+		while current and not (current.world.killed) and len(trace) < len(self.start.world.lambda_map) * len(self.start.world.lambda_map[0]):
+			randomize = False
+			# check if we can still move
+			if len(current.actionsresults) == len(ACTIONS):
+				breakable = True
+				for i in ACTIONS:
+					if current.actionsresults[i] != None and current.actionsresults[i] not in trace:
+						breakable = False
+						break
+				#if not, break the while
+				if breakable:
+					break
+					
+			if current.maxhopeaction != "A":
+				next_move = current.maxhopeaction
+				randomize = random.randint(0,100) < curiosity
+			else:
+				randomize = True
+			
 			random.seed = time.clock()
-			randmove = random.randint(0,len(ACTIONS)+len(current.parents))
-			if randmove > len(ACTIONS):
-				pdb.set_trace()
-				current = current.parents[randmove - len(ACTIONS)]
-			current.explore(randmove, self.ASV)
-			if current.actionsresults[randmove] != None:
-				current = current.actionsresults[randmove]
-				self.update_parents(current)
-		
+			if randomize:
+				next_move = ACTIONS[random.randint(0, len(ACTIONS)-1)]
+			#~ print "current :", current
+			#~ print "trace : ", trace
+			#~ pdb.set_trace()
+			current.explore(next_move, self.ASV)
+			if current.actionsresults[next_move] and current.actionsresults[next_move] not in trace:
+				current = current.actionsresults[next_move]
+				trace.append(current)
+		#pdb.set_trace()
+		trace.reverse()
+		#~ reverse_start = current
+		#~ while reverse_start != self.start:
+			#~ self.update(reverse_start)
+			#~ reverse_start = reverse_start.parent
+		for state in trace:
+			self.update(state)
+			
 		return True
 			
 		#~ print "************* END ****************************"
@@ -162,7 +183,9 @@ class botcontroler(controler):
 		#~ print "*****************************************"
 		#~ print self.ASV[hash_the_world(self.world)]
 		#~ pdb.set_trace()
+		print "called get next"
 		if not self.updated:
+			print "saving map"
 			self.updated = True
 			#~ self.update()
 			f = open("saved_map","w")
