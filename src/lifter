@@ -41,13 +41,13 @@ def handlerdebug(signum, frame):
 			try:
 				nextmove = control.get_next()
 				route+=nextmove
-				print "Route : ", route
 				world.set_movement(nextmove)					
 				score += world.get_points()
+				time.sleep(0.25)
 				os.system("clear")
 				displayer.draw()
-				time.sleep(1)
 				world.print_status()
+				print "Route : ", route
 				if nextmove == "A":
 					print "abort ", score
 					reset_tty_and_exit()
@@ -62,8 +62,9 @@ def handlerdebug(signum, frame):
 				raise
 	if signum == signal.SIGTERM:
 		print 'SIGTERM, we exit as well, did we miss SIGINT ??'
-		cont.set_movement("A")
-		reset_tty_and_exit()
+		#~ ODIEUX, la map s'affiche!
+		#~ cont.set_movement("A")
+		#~ reset_tty_and_exit()
 
 
 def handler(signum, frame):

@@ -207,8 +207,6 @@ class botcontroler(controler):
 		if self.solution_trace_len > self.start.world.num_cols * self.start.world.num_rows:
 			return "A"
 		state = self.start
-		if not world :
-			return "A"
 		action = state.maxhopeaction
 		if action != "A":
 			if action not in state.actionsresults:
