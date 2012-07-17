@@ -106,7 +106,7 @@ class explorerstate:
 class botcontroler(controler):
 	
 	def __init__(self, world):
-		controler.__init__(self, world)
+		controler.__init__(self, copy.deepcopy(world))
 		
 		if world.hasBeard:
 			actions.append("S")
