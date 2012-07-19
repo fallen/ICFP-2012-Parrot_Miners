@@ -11,7 +11,7 @@ import hashlib
 			
 def hash_the_world(world):
 	hasher = hashlib.sha1()
-	hasher.update(world.lambda_map.__str__().replace(".", " "))
+	hasher.update(world.lambda_map.__str__())
 	if (world.hasWater):
 		hasher.update(world.waterworld.water.__str__())
 	if (world.hasBeard):
@@ -110,9 +110,25 @@ class botcontroler(controler):
 		
 		if world.hasBeard:
 			actions.append("S")
-			
+		
+		for x in range(1, len(self.world.lambda_map) - 1):
+			for y in range(1,len(self.world.lambda_map[x]) - 1):
+				point = self.world.lambda_map[x][y]
+				if point == '.':
+					removable = True
+					for z in range(y,len(self.world.lambda_map[x]) - 1):
+						if self.world.lambda_map[x][z] == '#':
+							break
+						if self.world.lambda_map[x][z] == '*' or self.world.lambda_map[x+1][z] == '*' or self.world.lambda_map[x-1][z] in ['*', '\\']:
+							removable = False
+
+					if removable:
+						self.world.lambda_map[x][y] = ' '
+		
+		
 		self.ASV = {}
-		self.start = self.ASV[hash_the_world(world)] = explorerstate(world)
+		self.start = self.ASV[hash_the_world(self.world)] = explorerstate(self.world)
+		#~ print self.start
 		self.updated = False
 		self.solution_trace_len = 0
 			
@@ -171,7 +187,7 @@ class botcontroler(controler):
 				# Better to have a variable to record trace length instead of calculating it over and over again
 				trace_len += 1
 		#pdb.set_trace()
-		trace.pop()
+		#~ trace.pop()
 		trace.reverse()
 		#~ reverse_start = current
 		#~ while reverse_start != self.start:
