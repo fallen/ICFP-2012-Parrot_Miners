@@ -181,8 +181,9 @@ class botcontroler(controler):
 			#~ print "current :", current
 			#~ print "trace : ", trace
 			#~ pdb.set_trace()
-			for action in ACTIONS:
-				current.explore(action, self.ASV)
+			#~ for action in ACTIONS:
+				#~ current.explore(action, self.ASV)
+			current.explore(next_move, self.ASV)
 			if current.actionsresults[next_move] and current.actionsresults[next_move] not in trace:
 				current = current.actionsresults[next_move]
 				trace.append(current)
