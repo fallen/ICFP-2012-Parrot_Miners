@@ -62,26 +62,24 @@ class kcontroler(controler):
 ACTIONS = ["U", "R", "L", "D"]
 
 class explorerstate:
-	def __init__(self, world):
-		self.world = world
+	def __init__(self):
 		self.actionsresults = {}
 		self.actionspoints = {}
 		self.hope = 0
 		self.maxhopeaction = "A"
 		self.visited = False
 		
-	def explore(self, move, ASV):
-		cworld = copy.deepcopy(self.world)
-		if cworld.set_movement(move):
-			cworld_hash = hash_the_world(cworld)
-			if cworld_hash not in ASV:
-				self.actionsresults[move] = explorerstate(cworld)
-				self.actionspoints[move] = cworld.get_points()
-				ASV[cworld_hash] = self.actionsresults[move]
+	def explore(self, world, move, ASV):
+		if world.set_movement(move):
+			world_hash = hash_the_world(world)
+			if world_hash not in ASV:
+				self.actionsresults[move] = explorerstate()
+				self.actionspoints[move] = world.get_points()
+				ASV[world_hash] = self.actionsresults[move]
 				return True
 			else:
-				self.actionsresults[move] = ASV[cworld_hash]
-				self.actionspoints[move] = cworld.get_points()
+				self.actionsresults[move] = ASV[world_hash]
+				self.actionspoints[move] = world.get_points()
 		
 		else:
 			self.actionsresults[move] = None
@@ -90,7 +88,6 @@ class explorerstate:
 
 	def __str__(self):
 		print hex(id(self))
-		MapDrawer(self.world.lambda_map,{}).draw()
 		#~ for key, value in self.actionsresults.iteritems():
 			#~ print key, " : "
 			#~ if value != None:
@@ -106,7 +103,7 @@ class explorerstate:
 class botcontroler(controler):
 	
 	def __init__(self, world):
-		controler.__init__(self, copy.deepcopy(world))
+		controler.__init__(self, world)
 		
 		if world.hasBeard:
 			ACTIONS.append("S")
@@ -127,16 +124,19 @@ class botcontroler(controler):
 		
 		
 		self.ASV = {}
-		self.start = self.ASV[hash_the_world(self.world)] = explorerstate(self.world)
+		self.start = self.ASV[hash_the_world(self.world)] = explorerstate()
 		#~ print self.start
 		self.updated = False
 		self.solution_trace_len = 0
 		self.final_trace = []
-			
-	def update(self, current):
+		
+		self.exp_step_per_sec = 0
+		self.start_count = 0
+		
+	def update(self, current, world=None):
 		hopemax = -1500
-		if current.world.won:
-			current.hope = current.world.get_points()
+		if world and world.won:
+			current.hope = world.get_points()
 			return
 		for move in current.actionsresults:
 			if current.actionsresults[move] != None:
@@ -145,18 +145,28 @@ class botcontroler(controler):
 					hopemax = hopemove
 					current.maxhopeaction = move
 		current.hope = hopemax
-			
+		
 	def explore_step(self):
+		#uncomment to mesure perf
+		#~ self.exp_step_per_sec +=1
+		#~ if self.start_count == 0:
+			#~ self.start_count = time.clock()+1
+		#~ elif self.start_count < time.clock():
+			#~ print self.exp_step_per_sec, " step/s"
+			#~ self.start_count = 0
+			#~ self.exp_step_per_sec=0
+		
 		trace = []
 		trace_len = 0
-		curiosity = 10
+		curiosity = 20
 		
-		current = self.start
+		world = copy.deepcopy(self.world)
+		current = self.ASV[hash_the_world(world)]
 		trace.append(current)
 		#~ print "exploring_step"
-		trace_max = self.start.world.num_cols * self.start.world.num_rows
+		trace_max = world.num_cols * world.num_rows
 		ACTIONS_len = len(ACTIONS)
-		while current and not current.world.won and not (current.world.killed) and trace_len < trace_max:
+		while current and not world.won and not world.killed and trace_len < trace_max:
 			randomize = False
 			# check if we can still move
 			if len(current.actionsresults) == ACTIONS_len:
@@ -178,24 +188,20 @@ class botcontroler(controler):
 			random.seed = time.clock()
 			if randomize:
 				next_move = ACTIONS[random.randint(0, len(ACTIONS)-1)]
-			#~ print "current :", current
-			#~ print "trace : ", trace
-			#~ pdb.set_trace()
-			#~ for action in ACTIONS:
-				#~ current.explore(action, self.ASV)
-			current.explore(next_move, self.ASV)
-			if current.actionsresults[next_move] and current.actionsresults[next_move] not in trace:
+
+			current.explore(world, next_move, self.ASV)
+			if current.actionsresults[next_move]:
 				current = current.actionsresults[next_move]
-				trace.append(current)
+				#~ trace.append(current)
+				#~ MapDrawer(world.lambda_map,{}).draw()
+				print current
 				# Better to have a variable to record trace length instead of calculating it over and over again
 				trace_len += 1
-		#pdb.set_trace()
-		#~ trace.pop()
+
+		
+		self.update(trace.pop(), world)
+		
 		trace.reverse()
-		#~ reverse_start = current
-		#~ while reverse_start != self.start:
-			#~ self.update(reverse_start)
-			#~ reverse_start = reverse_start.parent
 		for state in trace:
 			self.update(state)
 			
@@ -227,7 +233,7 @@ class botcontroler(controler):
 			#~ sys.stdout = stdout
 		
 		self.solution_trace_len +=1
-		if self.solution_trace_len > self.start.world.num_cols * self.start.world.num_rows:
+		if self.solution_trace_len > self.world.num_cols * self.world.num_rows:
 			return "A"
 		state = self.start
 		self.final_trace.append(state)
