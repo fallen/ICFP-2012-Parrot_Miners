@@ -192,9 +192,9 @@ class botcontroler(controler):
 			current.explore(world, next_move, self.ASV)
 			if current.actionsresults[next_move]:
 				current = current.actionsresults[next_move]
-				#~ trace.append(current)
+				trace.append(current)
 				#~ MapDrawer(world.lambda_map,{}).draw()
-				print current
+				#~ print current
 				# Better to have a variable to record trace length instead of calculating it over and over again
 				trace_len += 1
 
