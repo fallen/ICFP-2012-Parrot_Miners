@@ -109,7 +109,7 @@ class botcontroler(controler):
 		controler.__init__(self, copy.deepcopy(world))
 		
 		if world.hasBeard:
-			actions.append("S")
+			ACTIONS.append("S")
 		
 		for x in range(1, len(self.world.lambda_map) - 1):
 			for y in range(1,len(self.world.lambda_map[x]) - 1):
@@ -131,6 +131,7 @@ class botcontroler(controler):
 		#~ print self.start
 		self.updated = False
 		self.solution_trace_len = 0
+		self.final_trace = []
 			
 	def update(self, current):
 		hopemax = -1500
@@ -180,7 +181,8 @@ class botcontroler(controler):
 			#~ print "current :", current
 			#~ print "trace : ", trace
 			#~ pdb.set_trace()
-			current.explore(next_move, self.ASV)
+			for action in ACTIONS:
+				current.explore(action, self.ASV)
 			if current.actionsresults[next_move] and current.actionsresults[next_move] not in trace:
 				current = current.actionsresults[next_move]
 				trace.append(current)
@@ -222,11 +224,16 @@ class botcontroler(controler):
 			#~ print "**********************"
 			#~ for value in self.ASV.values(): print value
 			#~ sys.stdout = stdout
-			
+		
 		self.solution_trace_len +=1
 		if self.solution_trace_len > self.start.world.num_cols * self.start.world.num_rows:
 			return "A"
 		state = self.start
+		self.final_trace.append(state)
+		if len(self.final_trace) > 3:
+			if self.final_trace[len(self.final_trace)-1] == self.final_trace[len(self.final_trace)-3]:
+				return "A"
+				
 		action = state.maxhopeaction
 		if action != "A":
 			if action not in state.actionsresults:

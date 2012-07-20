@@ -59,7 +59,7 @@ if len(sys.argv) == 2:
 
 maps=[ "contest"+str(j) for j in range(1,11)]
 maps.extend(["flood"+str(i) for i in range(1,6)])
-maps.extend([ "trampoline"+str(k) for k in range(1,5)])
+maps.extend([ "trampoline"+str(k) for k in range(1,4)])
 maps.extend([ "horock"+str(k) for k in range(1,4)])
 maps.extend([ "beard"+str(k) for k in range(1,6)])
 for m in maps:
