@@ -123,13 +123,7 @@ class botcontroler(controler):
 		
 	def explore_step(self):
 		#uncomment to mesure perf
-		#~ self.exp_step_per_sec +=1
-		#~ if self.start_count == 0:
-			#~ self.start_count = time.clock()+1
-		#~ elif self.start_count < time.clock():
-			#~ print self.exp_step_per_sec, " step/s"
-			#~ self.start_count = 0
-			#~ self.exp_step_per_sec=0
+
 		
 		trace = []
 		curiosity = 10
@@ -141,6 +135,15 @@ class botcontroler(controler):
 		trace_max = self.world.num_cols * self.world.num_rows
 		ACTIONS_len = len(ACTIONS)
 		while current and not self.world.won and not self.world.killed and len(trace) < trace_max:
+			
+			self.exp_step_per_sec +=1
+			if self.start_count == 0:
+				self.start_count = time.clock()+1
+			elif self.start_count < time.clock():
+				print self.exp_step_per_sec, " step/s"
+				self.start_count = 0
+				self.exp_step_per_sec=0
+			
 			randomize = False
 			# check if we can still move
 			if len(current.actionsresults) == len(ACTIONS):
