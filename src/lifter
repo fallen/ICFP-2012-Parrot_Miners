@@ -5,7 +5,6 @@
 import sys, os, signal, time
 from threading import Thread
 from threading import Event
-from displayer import MapDrawer
 from mapupdater import world, normallogger
 from controler import controler, kcontroler, botcontroler, SimulatorDieEvent
 
@@ -41,12 +40,12 @@ def handlerdebug(signum, frame):
 			try:
 				nextmove = control.get_next()
 				route+=nextmove
-				world.set_movement(nextmove)					
+				world.set_movement(nextmove)
+				world.validate(True)					
 				score += world.get_points()
 				time.sleep(0.25)
 				os.system("clear")
-				displayer.draw()
-				world.print_status()
+				print world
 				print "Route : ", route
 				if nextmove == "A":
 					print "abort ", score
@@ -101,6 +100,19 @@ def limiter_simulator():
 	return
 
 
+
+def reindex(lambda_map):
+	height = len(lambda_map)
+	width = len(lambda_map[0])
+	
+	lambda_indexed=[[ 'X' for i in range(height)] for i in range(width) ]
+	for i in range(width):
+		for j in range(height):
+			lambda_indexed[i][j]=lambda_map[j][i]
+			 # Filling beards list coordinates.
+	return lambda_indexed
+	
+	
 if debug:
 	limiter_thread=Thread(None,limiter_simulator,"Resources limiter").start()
 
@@ -164,19 +176,19 @@ for i, val in enumerate(lambda_map):
 	if len(lambda_map[i]) != maxcol:
 		val.extend([' ' for padder in range(maxcol - len(val))])
 
-displayer=MapDrawer(lambda_map,trampolines)
-displayer.reindex()
+
+lambda_map = reindex(lambda_map)
 #Now lambda_map is "reindexed"
 #get stuff out of displayer, try to minimise full traversal from happening
-lambda_map=displayer.getmap()
-lambdas=displayer.getlambda()
-robotpos=displayer.getrobotpos()
-trampstuff=displayer.gettrampostuff()
-beards=displayer.getbeards()
+#~ lambda_map=displayer.getmap()
+#~ lambdas=displayer.getlambda()
+#~ robotpos=displayer.getrobotpos()
+#~ trampstuff=displayer.gettrampostuff()
+#~ beards=displayer.getbeards()
 
-beardstuff=(razors,growth,beards)
-waterstuff=(water_value,flooding_value,waterproof_value)
-world = world(lambda_map, robotpos,lambdas,trampstuff,  waterstuff, beardstuff)
+#~ beardstuff=(razors,growth,beards)
+#~ waterstuff=(water_value,flooding_value,waterproof_value)
+world = world(lambda_map) #, robotpos,lambdas,trampstuff,  waterstuff, beardstuff)
 
 if debug and sys.argv[1] == "kcontroler":
 	control = kcontroler(world)
@@ -186,8 +198,7 @@ elif debug and sys.argv[1] == "botcontroler" or not debug:
 
 if debug :
 	os.system("clear")
-	displayer.draw()
-	world.print_status()
+	print world
 #~ control = botcontroler(world)
 
 # We set terminal in raw mode to catch single key events
@@ -201,8 +212,7 @@ if debug and sys.argv[1] == "kcontroler":
 		world.set_movement(control.get_next())
 		score += world.get_points()
 		os.system("clear")
-		displayer.draw()
-		world.print_status()
+		print world
 		if world.killed:
 			print "lost"
 			reset_tty_and_exit()

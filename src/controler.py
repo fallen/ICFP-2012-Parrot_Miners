@@ -4,19 +4,10 @@ from mapupdater import world
 from threading import Event
 import random
 import time
-from displayer import MapDrawer
 import pdb
-import hashlib
 
-			
-def hash_the_world(world):
-	hasher = hashlib.sha1()
-	hasher.update(world.lambda_map.__str__())
-	if (world.hasWater):
-		hasher.update(world.waterworld.water.__str__())
-	if (world.hasBeard):
-		hasher.update(world.wadlersbeard.__str__())
-	return hasher.digest()
+	
+
 	
 class SimulatorDieEvent:
 	stop_that=Event()
@@ -71,7 +62,7 @@ class explorerstate:
 		
 	def explore(self, world, move, ASV):
 		if world.set_movement(move):
-			world_hash = hash_the_world(world)
+			world_hash = world.hash()
 			if world_hash not in ASV:
 				self.actionsresults[move] = explorerstate()
 				self.actionspoints[move] = world.get_points()
@@ -92,7 +83,7 @@ class explorerstate:
 			#~ print key, " : "
 			#~ if value != None:
 				#~ MapDrawer(value.lambda_map).draw()
-		
+		# TODO : print the map
 		print "hope : ", self.hope
 		print "maxkey : ", self.maxhopeaction
 		print "scoring :", self.actionspoints
@@ -103,28 +94,12 @@ class explorerstate:
 class botcontroler(controler):
 	
 	def __init__(self, world):
-		controler.__init__(self, world)
+		controler.__init__(self, copy.deepcopy(world))
 		
-		if world.hasBeard:
-			ACTIONS.append("S")
-		
-		for x in range(1, len(self.world.lambda_map) - 1):
-			for y in range(1,len(self.world.lambda_map[x]) - 1):
-				point = self.world.lambda_map[x][y]
-				if point == '.':
-					removable = True
-					for z in range(y,len(self.world.lambda_map[x]) - 1):
-						if self.world.lambda_map[x][z] == '#':
-							break
-						if self.world.lambda_map[x][z] == '*' or self.world.lambda_map[x+1][z] == '*' or self.world.lambda_map[x-1][z] in ['*', '\\']:
-							removable = False
-
-					if removable:
-						self.world.lambda_map[x][y] = ' '
-		
-		
+		#~ if world.hasBeard:
+			#~ ACTIONS.append("S")		
 		self.ASV = {}
-		self.start = self.ASV[hash_the_world(self.world)] = explorerstate()
+		self.start = self.ASV[self.world.hash()] = explorerstate()
 		#~ print self.start
 		self.updated = False
 		self.solution_trace_len = 0
@@ -157,49 +132,48 @@ class botcontroler(controler):
 			#~ self.exp_step_per_sec=0
 		
 		trace = []
-		trace_len = 0
-		curiosity = 20
+		curiosity = 10
 		
-		world = copy.deepcopy(self.world)
-		current = self.ASV[hash_the_world(world)]
+		self.world.reset()
+		current = self.ASV[self.world.hash()]
 		trace.append(current)
 		#~ print "exploring_step"
-		trace_max = world.num_cols * world.num_rows
+		trace_max = self.world.num_cols * self.world.num_rows
 		ACTIONS_len = len(ACTIONS)
-		while current and not world.won and not world.killed and trace_len < trace_max:
+		while current and not self.world.won and not self.world.killed and len(trace) < trace_max:
 			randomize = False
 			# check if we can still move
-			if len(current.actionsresults) == ACTIONS_len:
-				breakable = True
-				for i in ACTIONS:
-					if current.actionsresults[i] != None and current.actionsresults[i] not in trace:
-						breakable = False
-						break
-				#if not, break the while
-				if breakable:
+			if len(current.actionsresults) == len(ACTIONS):
+				if len([item for item in current.actionsresults if (current.actionsresults[item] not in trace and current.actionsresults[item] != None)]) == 0:
 					break
 					
+			random.seed = time.clock()
+								
 			if current.maxhopeaction != "A":
 				next_move = current.maxhopeaction
 				randomize = random.randint(0,100) < curiosity
 			else:
 				randomize = True
 			
-			random.seed = time.clock()
 			if randomize:
-				next_move = ACTIONS[random.randint(0, len(ACTIONS)-1)]
+				next_move = ACTIONS[random.randint(0, len(ACTIONS)-1)]		
+			
+			current.explore(self.world, next_move, self.ASV)
 
-			current.explore(world, next_move, self.ASV)
-			if current.actionsresults[next_move]:
+			
+			if current.actionsresults[next_move] and current.actionsresults[next_move] not in trace:
+				
+				#~ os.system("clear")
+				#~ print self.world
+				#~ print current
+				#~ time.sleep(0.1)
+				self.world.validate(True)
 				current = current.actionsresults[next_move]
 				trace.append(current)
-				#~ MapDrawer(world.lambda_map,{}).draw()
-				#~ print current
-				# Better to have a variable to record trace length instead of calculating it over and over again
-				trace_len += 1
-
-		
-		self.update(trace.pop(), world)
+			else:
+				self.world.validate(False)
+			
+		self.update(trace.pop(), self.world)
 		
 		trace.reverse()
 		for state in trace:
