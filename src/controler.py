@@ -105,9 +105,9 @@ class explorerstate:
 
 class botcontroler(controler):
 	
-	def __init__(self, world):
+	def __init__(self, world, curiosity):
 		controler.__init__(self, copy.deepcopy(world))
-		
+		self.curiosity = curiosity
 		if world.hasBeard:
 			ACTIONS.append("S")
 		
@@ -132,7 +132,9 @@ class botcontroler(controler):
 		self.updated = False
 		self.solution_trace_len = 0
 		self.final_trace = []
-			
+		self.exp_step_per_sec = 0
+		self.start_count = 0
+		
 	def update(self, current):
 		hopemax = -1500
 		if current.world.won:
@@ -149,7 +151,6 @@ class botcontroler(controler):
 	def explore_step(self):
 		trace = []
 		trace_len = 0
-		curiosity = 10
 		
 		current = self.start
 		trace.append(current)
@@ -157,6 +158,15 @@ class botcontroler(controler):
 		trace_max = self.start.world.num_cols * self.start.world.num_rows
 		ACTIONS_len = len(ACTIONS)
 		while current and not current.world.won and not (current.world.killed) and trace_len < trace_max:
+			
+			#~ self.exp_step_per_sec +=1
+			#~ if self.start_count == 0:
+				#~ self.start_count = time.clock()+1
+			#~ elif self.start_count < time.clock():
+				#~ print self.exp_step_per_sec, " step/s"
+				#~ self.start_count = 0
+				#~ self.exp_step_per_sec=0
+				
 			randomize = False
 			# check if we can still move
 			if len(current.actionsresults) == ACTIONS_len:
@@ -171,7 +181,7 @@ class botcontroler(controler):
 					
 			if current.maxhopeaction != "A":
 				next_move = current.maxhopeaction
-				randomize = random.randint(0,100) < curiosity
+				randomize = random.randint(0,100) < self.curiosity
 			else:
 				randomize = True
 			

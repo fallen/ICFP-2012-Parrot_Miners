@@ -46,9 +46,10 @@ def test_map(mapname, route):
 		print "Mining complete : got all lambdas \o/" #You rock
 	score2=string.replace(score,"<br>"," ") # Remove nasty <br> on completion, do nothing otherwise
 	print "Score = "+score2
-
+	
 	if broken:
 		print "Robot broken"
+	return int(score2.split(" ")[0])
 
 if len(sys.argv) == 2:
 	print "Running single map "+sys.argv[1]
@@ -62,6 +63,16 @@ maps.extend(["flood"+str(i) for i in range(1,6)])
 maps.extend([ "trampoline"+str(k) for k in range(1,4)])
 maps.extend([ "horock"+str(k) for k in range(1,4)])
 maps.extend([ "beard"+str(k) for k in range(1,6)])
-for m in maps:
-	output=check_output("./valid/runmap.sh "+m)
-	test_map(m,output[0])
+csvfile = open("results.csv", "w")
+csvfile.close()
+for calcultime in [10,60,120,180]:
+	for curiosity in [10,20,30,40,50,60,70,80,90,100]:
+		scoredsum =0
+		for m in maps:
+			print "testing ", calcultime, ";", curiosity,";", m
+			output=check_output("./valid/runmap.sh "+m+" "+str(curiosity)+" "+str(calcultime))
+			scoredsum += test_map(m,output[0])
+		csvfile = open("results.csv", "a")
+		csvfile.write(str(calcultime)+";"+str(curiosity)+";"+str(scoredsum)+"\n")
+		csvfile.close()
+		print str(calcultime)+";"+str(curiosity)+";"+str(scoredsum)+"\n"

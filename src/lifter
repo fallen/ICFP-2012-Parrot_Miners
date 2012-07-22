@@ -10,8 +10,8 @@ from mapupdater import world, normallogger
 from controler import controler, kcontroler, botcontroler, SimulatorDieEvent
 
 
-if len(sys.argv) != 1 and len(sys.argv) != 3:
-	print "usage: ", sys.argv[0], " debug <map_file_map>"
+if len(sys.argv) != 2 and len(sys.argv) != 3:
+	print "usage: ", sys.argv[0], " debug <bot>  <map_file_map>"
 	print "       or ",sys.argv[0]," < <map_file_map>"
 	exit(1)
 	
@@ -113,6 +113,11 @@ if debug :
 else:
 	f = sys.stdin
 
+if not debug:
+	curiosity = sys.argv[1]
+else:
+	curiosity = 20
+	
 with f as m:
 	water_value=0
 	flooding_value=0
@@ -181,7 +186,7 @@ world = world(lambda_map, robotpos,lambdas,trampstuff,  waterstuff, beardstuff)
 if debug and sys.argv[1] == "kcontroler":
 	control = kcontroler(world)
 elif debug and sys.argv[1] == "botcontroler" or not debug:
-	control = botcontroler(world)
+	control = botcontroler(world, curiosity)
 	
 
 if debug :
